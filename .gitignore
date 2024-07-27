@@ -1,0 +1,5 @@
+# LAMMPS files
+*.lmp
+
+# Compiled executable files
+*.out
