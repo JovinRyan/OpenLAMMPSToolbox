@@ -4,3 +4,6 @@
 
 # Compiled executable files
 *.out
+
+# Misc.
+*.vscode
