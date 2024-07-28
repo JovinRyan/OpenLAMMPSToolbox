@@ -6,11 +6,11 @@ atom::atom(int ID, int Type, double x, double y, double z) : id(ID), type(Type),
 {
 }
 
-std::vector<double> atom::getCoords()
+std::vector<double> atom::get_coords()
 {
-  std::vector<double> atomCoord{x_coord, y_coord, z_coord};
+  std::vector<double> atom_coord{x_coord, y_coord, z_coord};
 
-  return atomCoord;
+  return atom_coord;
 }
 
 int atom::get_id() { return id; }
