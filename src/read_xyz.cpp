@@ -1,10 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "./utils/string_to_vec.cpp"
+// #include "./utils/string_to_vec.cpp"
 #include "dump_data_container.cpp"
+#include "frame_to_rtree.cpp"
 
-dump_data_container getDumpData(std::ifstream &infile)
+dump_data_container xyzToDumpData(std::ifstream &infile)
 {
   std::vector<int> infileindexes;
   std::vector<int> atomscount;
@@ -37,18 +38,23 @@ dump_data_container getDumpData(std::ifstream &infile)
     frameindexpairs.push_back(std::make_pair(infileindexes[i] + 1, infileindexes[i] + atomscount[0]));
   }
 
-  std::vector<std::vector<atom>> frame_atoms_vec(size(frameindexpairs));
+  // std::vector<std::vector<atom>> frame_atoms_vec(size(frameindexpairs));
 
-  for (int i = 0; i < size(frame_atoms_vec); i++)
-  {
-    int start_index = frameindexpairs[i].first, stop_index = frameindexpairs[i].second;
-    for (int j = start_index - 1; j < stop_index; j++)
-    {
-      frame_atoms_vec[i].push_back(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]), stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3])));
-    } /* Sloppy numbering for ID but it works */
-  }
+  // for (int i = 0; i < size(frame_atoms_vec); i++)
+  // {
+  //   int start_index = frameindexpairs[i].first, stop_index = frameindexpairs[i].second;
+  //   for (int j = start_index - 1; j < stop_index; j++)
+  //   {
+  //     frame_atoms_vec[i].push_back(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]), stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3])));
+  //   } /* Sloppy numbering for ID but it works */
+  // }
 
-  return dump_data_container(timesteps, atomscount, frame_atoms_vec);
+  std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::linear<16>>> frame_atoms_rT = frameToRtree(parsedfile, frameindexpairs);
+
+  std::cout << size(frame_atoms_rT) << "\n";
+  std::cout << boost::size(frame_atoms_rT[0]) << "\n";
+
+  return dump_data_container(timesteps, atomscount, frame_atoms_rT);
 }
 
 int main(int argc, char *argv[])
@@ -72,7 +78,11 @@ int main(int argc, char *argv[])
   std::ifstream infile(argv[1]);
   if (infile.is_open() && infile.good())
   {
-    dump_data_container test1 = getDumpData(infile);
+    dump_data_container test = xyzToDumpData(infile);
+    for (int i = 0; i < size(test.get_timestep_vec()); i++)
+    {
+      std::cout << "Frame " << i + 1 << ": " << size(test.get_frame_atoms_rT()) << " " << boost::size(test.get_frame_atoms_rT()[i]) << "\n";
+    }
   }
 
   return 0;

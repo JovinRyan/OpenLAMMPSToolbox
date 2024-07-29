@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 
 class atom
@@ -12,7 +13,6 @@ public:
   double z_coord;
 
   atom(int ID, int Type, double x, double y, double z);
-  ~atom();
 
   std::vector<double> get_coords();
   int get_id();

@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../include/atom.h"
 
 atom::atom(int ID, int Type, double x, double y, double z) : id(ID), type(Type), x_coord(x), y_coord(y), z_coord(z)
@@ -15,7 +13,3 @@ std::vector<double> atom::get_coords()
 
 int atom::get_id() { return id; }
 int atom::get_type() { return type; }
-
-atom::~atom()
-{
-}
