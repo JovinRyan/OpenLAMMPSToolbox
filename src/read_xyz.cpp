@@ -1,9 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-// #include "./utils/string_to_vec.cpp"
+#include "./utils/string_to_vec.cpp"
 #include "dump_data_container.cpp"
-#include "./utils/frame_to_rtree.cpp"
 #include "./calculations/ddc_get_displacement.cpp"
 
 dump_data_container xyzToDumpData(std::ifstream &infile)
@@ -48,6 +47,7 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
     {
       frame_atoms_vec[i].push_back(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]), stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3])));
     } /* Sloppy numbering for ID but it works */
+    std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }
 
   return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec);
@@ -80,7 +80,12 @@ int main(int argc, char *argv[])
     //   // std::cout << "Frame " << i + 1 << ": " << size(test.get_frame_atoms_rT()) << " " << boost::size(test.get_frame_atoms_rT()[i]) << "\n";
     // }
     // std::vector<int> test1 = test.get_displacements_vec(2.86, 0.3);
-    std::vector<int> test_vec = get_displacement_vec(test, 2.48, 0.3);
+    std::vector<int> test_vec = get_displacement_vec(test, 2.86, 0.3);
+
+    for (int i = 0; i < size(test_vec); i++)
+    {
+      std::cout << "Diplaced Atoms: " << test_vec[i] << "\n";
+    }
   }
 
   return 0;
