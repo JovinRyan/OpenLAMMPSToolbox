@@ -3,14 +3,15 @@
 #include <vector>
 // #include "./utils/string_to_vec.cpp"
 #include "dump_data_container.cpp"
-#include "frame_to_rtree.cpp"
+#include "./utils/frame_to_rtree.cpp"
+#include "./calculations/ddc_get_displacement.cpp"
 
 dump_data_container xyzToDumpData(std::ifstream &infile)
 {
   std::vector<int> infileindexes;
-  std::vector<int> atomscount;
+  std::vector<int> atomscount_vec;
   std::vector<std::pair<int, int>> frameindexpairs;
-  std::vector<double> timesteps;
+  std::vector<double> timesteps_vec;
   std::vector<std::string> parsedfile;
 
   std::string line;
@@ -23,38 +24,33 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
     {
       std::vector<std::string> line_vec = string_to_vec(line); // string_to_vec() std::string -> std::vector<std::string> from ./utils/string_to_vec.cpp
       infileindexes.push_back(line_num);
-      timesteps.push_back(stod(line_vec.back()));
+      timesteps_vec.push_back(stod(line_vec.back()));
     }
     // Substring match to create atoms count vs timestep vector
     if (!(line.find(" ") != std::string::npos))
     {
-      atomscount.push_back(stoi(line));
+      atomscount_vec.push_back(stoi(line));
     }
   }
 
   // Creating vector of paired indexes to separate individual frames
   for (int i = 0; i < std::size(infileindexes); i++)
   {
-    frameindexpairs.push_back(std::make_pair(infileindexes[i] + 1, infileindexes[i] + atomscount[0]));
+    frameindexpairs.push_back(std::make_pair(infileindexes[i] + 1, infileindexes[i] + atomscount_vec[0]));
   }
 
-  // std::vector<std::vector<atom>> frame_atoms_vec(size(frameindexpairs));
+  std::vector<std::vector<atom>> frame_atoms_vec(size(frameindexpairs));
 
-  // for (int i = 0; i < size(frame_atoms_vec); i++)
-  // {
-  //   int start_index = frameindexpairs[i].first, stop_index = frameindexpairs[i].second;
-  //   for (int j = start_index - 1; j < stop_index; j++)
-  //   {
-  //     frame_atoms_vec[i].push_back(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]), stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3])));
-  //   } /* Sloppy numbering for ID but it works */
-  // }
+  for (int i = 0; i < size(frame_atoms_vec); i++)
+  {
+    int start_index = frameindexpairs[i].first, stop_index = frameindexpairs[i].second;
+    for (int j = start_index - 1; j < stop_index; j++)
+    {
+      frame_atoms_vec[i].push_back(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]), stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3])));
+    } /* Sloppy numbering for ID but it works */
+  }
 
-  std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::linear<16>>> frame_atoms_rT = frameToRtree(parsedfile, frameindexpairs);
-
-  std::cout << size(frame_atoms_rT) << "\n";
-  std::cout << boost::size(frame_atoms_rT[0]) << "\n";
-
-  return dump_data_container(timesteps, atomscount, frame_atoms_rT);
+  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec);
 }
 
 int main(int argc, char *argv[])
@@ -79,10 +75,12 @@ int main(int argc, char *argv[])
   if (infile.is_open() && infile.good())
   {
     dump_data_container test = xyzToDumpData(infile);
-    for (int i = 0; i < size(test.get_timestep_vec()); i++)
-    {
-      std::cout << "Frame " << i + 1 << ": " << size(test.get_frame_atoms_rT()) << " " << boost::size(test.get_frame_atoms_rT()[i]) << "\n";
-    }
+    // for (int i = 0; i < size(test.get_timestep_vec()); i++)
+    // {
+    //   // std::cout << "Frame " << i + 1 << ": " << size(test.get_frame_atoms_rT()) << " " << boost::size(test.get_frame_atoms_rT()[i]) << "\n";
+    // }
+    // std::vector<int> test1 = test.get_displacements_vec(2.86, 0.3);
+    std::vector<int> test_vec = get_displacement_vec(test, 2.48, 0.3);
   }
 
   return 0;
