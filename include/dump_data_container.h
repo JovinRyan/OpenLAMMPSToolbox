@@ -1,8 +1,6 @@
 #include <vector>
 #include "../src/atom.cpp"
-#include <boost/geometry.hpp>
-#include <boost/geometry/index/rtree.hpp>
-#include <boost/geometry/geometries/register/point.hpp>
+// #include "./atom.h"
 
 class dump_data_container
 {
@@ -11,12 +9,11 @@ private:
   std::vector<int> atomscount_vec;
 
 public:
-  // std::vector<std::vector<atom>> frame_atom_vec;
-  std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::linear<16>>> frame_atoms_rT;
+  std::vector<std::vector<atom>> frame_atoms_vec;
   dump_data_container(std::vector<double> t_vec, std::vector<int> ac_vec,
-                      std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::linear<16>>> fa_rT);
+                      std::vector<std::vector<atom>> fa_vec);
 
   std::vector<double> get_timestep_vec();
   std::vector<int> get_atomscount_vec();
-  std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::linear<16>>> get_frame_atoms_rT();
+  // std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::rstar<16>>> get_frame_atoms_vec();
 };

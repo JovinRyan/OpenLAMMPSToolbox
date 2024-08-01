@@ -15,6 +15,7 @@ public:
   atom(int ID, int Type, double x, double y, double z);
 
   std::vector<double> get_coords();
-  int get_id();
-  int get_type();
+  int get_id() const;
+  int get_type() const;
+  double get_distance(const atom &ref_atom);
 };
