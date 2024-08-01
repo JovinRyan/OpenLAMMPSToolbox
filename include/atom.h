@@ -17,5 +17,5 @@ public:
   std::vector<double> get_coords();
   int get_id() const;
   int get_type() const;
-  double get_displacement(atom ref_atom);
+  double get_distance(const atom &ref_atom);
 };
