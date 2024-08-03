@@ -7,3 +7,6 @@
 
 # Misc.
 *.vscode
+
+# Specific files made/used during development and testing
+atom_disp_test
