@@ -75,11 +75,7 @@ int main(int argc, char *argv[])
   if (infile.is_open() && infile.good())
   {
     dump_data_container test = xyzToDumpData(infile);
-    // for (int i = 0; i < size(test.get_timestep_vec()); i++)
-    // {
-    //   // std::cout << "Frame " << i + 1 << ": " << size(test.get_frame_atoms_rT()) << " " << boost::size(test.get_frame_atoms_rT()[i]) << "\n";
-    // }
-    // std::vector<int> test1 = test.get_displacements_vec(2.86, 0.3);
+
     std::vector<int> test_vec = get_displacement_vec(test, 2.86, 0.3);
 
     for (int i = 0; i < size(test_vec); i++)
