@@ -11,7 +11,7 @@ std::vector<int> get_displacement_vec(dump_data_container in_dump, double lattic
   double disp_threshold = lattice_param * tol;
   std::vector<std::vector<atom>> fa_vec = in_dump.frame_atoms_vec;
 
-  std::cout << "Calculating # of Atoms Displaced >=" << disp_threshold << " units." << "\n";
+  std::cout << "Calculating # of Atoms Displaced >= " << disp_threshold << " units." << "\n";
 
   for (int i = 1; i < size(fa_vec); i++)
   {
