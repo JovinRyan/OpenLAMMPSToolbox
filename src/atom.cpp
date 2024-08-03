@@ -19,5 +19,5 @@ double atom::get_distance(const atom &ref_atom)
 {
   return sqrt((x_coord - ref_atom.x_coord) * (x_coord - ref_atom.x_coord) +
               (y_coord - ref_atom.y_coord) * (y_coord - ref_atom.y_coord) +
-              (z_coord - ref_atom.y_coord) * (z_coord - ref_atom.y_coord));
+              (z_coord - ref_atom.z_coord) * (z_coord - ref_atom.z_coord));
 }
