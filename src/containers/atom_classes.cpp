@@ -1,7 +1,4 @@
-#pragma once
-
-#include "../include/atom.h"
-#include <cmath>
+#include "containers/atom_classes.h"
 
 atom::atom(int ID, int Type, double x, double y, double z) : id(ID), type(Type), x_coord(x), y_coord(y), z_coord(z)
 {
@@ -19,5 +16,9 @@ double atom::get_distance(const atom &ref_atom)
 {
   return sqrt((x_coord - ref_atom.x_coord) * (x_coord - ref_atom.x_coord) +
               (y_coord - ref_atom.y_coord) * (y_coord - ref_atom.y_coord) +
-              (z_coord - ref_atom.y_coord) * (z_coord - ref_atom.y_coord));
+              (z_coord - ref_atom.z_coord) * (z_coord - ref_atom.z_coord));
+}
+
+atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
+{
 }
