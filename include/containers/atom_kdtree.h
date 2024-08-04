@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef ATOM_KDTREE_H
 #define ATOM_KDTREE_H
 

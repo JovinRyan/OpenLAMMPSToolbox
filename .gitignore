@@ -13,3 +13,7 @@
 
 # Specific files made/used during development and testing
 atom_disp_test
+OpenLAMMPSToolbox
+
+# CMake files
+/build
