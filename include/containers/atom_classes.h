@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <cmath>
 
 class atom
 {
@@ -18,4 +19,13 @@ public:
   int get_id() const;
   int get_type() const;
   double get_distance(const atom &ref_atom);
+};
+
+class atom_pe_ke : atom
+{
+private:
+public:
+  double pe;
+  double ke;
+  atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE);
 };

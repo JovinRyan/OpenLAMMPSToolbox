@@ -1,6 +1,7 @@
+#pragma once
+
 #include <vector>
-#include "../src/atom.cpp"
-// #include "./atom.h"
+#include "atom_classes.h"
 
 class dump_data_container
 {
@@ -15,5 +16,4 @@ public:
 
   std::vector<double> get_timestep_vec();
   std::vector<int> get_atomscount_vec();
-  // std::vector<boost::geometry::index::rtree<atom, boost::geometry::index::rstar<16>>> get_frame_atoms_vec();
 };

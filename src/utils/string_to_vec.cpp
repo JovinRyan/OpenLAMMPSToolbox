@@ -1,7 +1,6 @@
-#include <sstream>
-#include <vector>
+#include "utils/string_to_vec.h"
 
-std::vector<std::string> string_to_vec(std::string s, std::string delimiter = " ")
+std::vector<std::string> string_to_vec(std::string s, std::string delimiter)
 {
   size_t pos_start = 0, pos_end, delim_len = delimiter.length();
   std::string token;

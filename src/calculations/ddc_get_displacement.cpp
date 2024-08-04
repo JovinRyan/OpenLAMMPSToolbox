@@ -1,8 +1,7 @@
 #include <vector>
 #include <iostream>
 
-#include "../dump_data_container.cpp"
-#include "../atom.cpp"
+#include "containers/dump_data_container.h"
 
 std::vector<int> get_displacement_vec(dump_data_container in_dump, double lattice_param, double tol)
 {
