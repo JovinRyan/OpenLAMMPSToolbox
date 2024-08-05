@@ -2,12 +2,13 @@ import pandas as pd
 import numpy as np
 
 from DFStructureFileWrite import DFStructFileWrite
+from CrystalPointsDict import getStruct_Points
 
 DIM_x = 50
 DIM_y = 100
 DIM_z = 100
 
-BCC_points = [[0, 0, 0], [0.5, 0.5, 0.5]]
+BCC_points = getStruct_Points("BCC")
 
 LATTICE_PARAM_a = 2.86
 
@@ -23,6 +24,8 @@ def getLatticePoints(Dim : float, Lattice_Param : float):
 L_p = getLatticePoints(DIM_x, LATTICE_PARAM_a)
 
 def populateLatticePoints3D(Latt_Points,  DimX, DimY, DimZ, LP_a, LP_b, LP_c):
+  print("Populating Lattice.")
+
   Lattice_3D_Matrix = []
   X_coords = []
   Y_coords = []

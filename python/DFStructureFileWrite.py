@@ -1,9 +1,9 @@
 import pandas as pd
 
 def getUnique(in_list):
-  unique_list = pd.Series(in_list).drop_duplicates().tolist()
+  unique_list = pd.Series(in_list).drop_duplicates().tolist() # Creates list of unique values from input list.
 
-  return len(unique_list)
+  return len(unique_list)                                     # Returns length -> used for writing atom types in struct file header.
 
 def DFStructFileWrite(DF : pd.DataFrame, FileName : str, xbuf = 0, ybuf = 0, zbuf = 0):
 
@@ -14,8 +14,14 @@ def DFStructFileWrite(DF : pd.DataFrame, FileName : str, xbuf = 0, ybuf = 0, zbu
   zlo = min(DF["Z"]) - zbuf
   zhi = max(DF["Z"]) + zbuf
 
+  print("Structure File Dimenstions: ")
+  print("X: " + str(xlo) + " " + str(xhi))
+  print("Y: " + str(ylo) + " " + str(yhi))
+  print("Z: " + str(zlo) + " " + str(zhi))
+
 
   with open(FileName, "w") as file:
+    print("Writing File: " + FileName)
     file.write("#Structure File Created Using OpenLAMMPSToolbox, a project by Jovin Ryan. See github.com/JovinRyan/OpenLAMMPSToolbox for more info.\n")
     file.write(str(len(DF)) + " atoms\n")
     file.write(str(getUnique(DF["Type"])) + " atom types\n\n")
