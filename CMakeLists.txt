@@ -27,9 +27,9 @@ set(SOURCE_FILES
 )
 
 set(MAIN_SOURCE_FILE
-    ${SOURCE_DIR}/main.cpp
+    ${SOURCE_DIR}/main_postprocessing.cpp
 )
 
-add_executable(${PROJECT_NAME} ${MAIN_SOURCE_FILE} ${SOURCE_FILES})
+add_executable(olt_postprocessing ${MAIN_SOURCE_FILE} ${SOURCE_FILES})
 
 include_directories(${INCLUDE_DIR})
