@@ -1,13 +1,9 @@
-#include <vector>
-#include <iostream>
+#include "calculations/ddc_get_displacement.h"
 
-#include "containers/dump_data_container.h"
-
-std::vector<int> get_displacement_vec(dump_data_container in_dump, double lattice_param, double tol)
+std::vector<int> get_displacement_vec(dump_data_container in_dump, double disp_threshold)
 {
   std::vector<int> displacement_vec;
 
-  double disp_threshold = lattice_param * tol;
   std::vector<std::vector<atom>> fa_vec = in_dump.frame_atoms_vec;
 
   std::cout << "Calculating # of Atoms Displaced >= " << disp_threshold << " units." << "\n";
@@ -23,6 +19,11 @@ std::vector<int> get_displacement_vec(dump_data_container in_dump, double lattic
       }
     }
     displacement_vec.push_back(count);
+  }
+
+  for (int i = 0; i < size(displacement_vec); i++)
+  {
+    std::cout << "Timestep: " << in_dump.get_timestep_vec()[1 + i] << " Number of Displaced Atoms: " << displacement_vec[i] << "\n";
   }
 
   return displacement_vec;
