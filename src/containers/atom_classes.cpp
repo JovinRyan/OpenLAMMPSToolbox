@@ -22,3 +22,11 @@ double atom::get_distance(const atom &ref_atom)
 atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
 {
 }
+
+double atom_pe_ke::get_pe() const { return pe; }
+double atom_pe_ke::get_ke() const { return ke; }
+
+double atom_pe_ke::get_total_energy()
+{
+  return pe + ke;
+}
