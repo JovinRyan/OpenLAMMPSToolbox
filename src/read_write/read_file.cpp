@@ -7,6 +7,7 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
   std::vector<std::pair<int, int>> frameindexpairs;
   std::vector<double> timesteps_vec;
   std::vector<std::string> parsedfile;
+  std::vector<std::vector<std::pair<double, double>>> frame_boxbounds_vec;
 
   std::string line;
   int line_num = 0;
@@ -45,7 +46,7 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }
 
-  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec);
+  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec, frame_boxbounds_vec);
 }
 
 dump_data_container customToDumpData(std::ifstream &infile)
@@ -55,6 +56,7 @@ dump_data_container customToDumpData(std::ifstream &infile)
   std::vector<double> timesteps_vec;
   std::vector<std::pair<int, int>> frameindexpairs;
   std::vector<std::string> parsedfile;
+  std::vector<std::vector<std::pair<double, double>>> frame_boxbounds_vec;
 
   std::string line;
   int line_num = 0;
@@ -82,6 +84,22 @@ dump_data_container customToDumpData(std::ifstream &infile)
       ++line_num;
       timesteps_vec.push_back(std::stod(line));
     }
+    // Finding box bounds
+    // Explicitly given in the files
+    if (line.find("ITEM: BOX BOUNDS") != std::string::npos)
+    {
+      std::vector<std::pair<double, double>> frame_bb;
+      for (int i = 0; i < 3; i++)
+      {
+        std::getline(infile, line);
+        parsedfile.push_back(line);
+        ++line_num;
+
+        frame_bb.push_back(std::make_pair(stod(string_to_vec(line)[0]), stod(string_to_vec(line)[1])));
+      }
+
+      frame_boxbounds_vec.push_back(frame_bb);
+    }
   }
 
   for (int i = 0; i < size(infileindexes); i++)
@@ -104,5 +122,5 @@ dump_data_container customToDumpData(std::ifstream &infile)
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }
 
-  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec);
+  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec, frame_boxbounds_vec);
 }

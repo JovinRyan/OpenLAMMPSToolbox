@@ -19,11 +19,12 @@ set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
 
 set(SOURCE_FILES
     ${SOURCE_DIR}/calculations/ddc_get_displacement.cpp
-    ${SOURCE_DIR}/containers/atom_classes.cpp
+    ${SOURCE_DIR}/containers/atom_classes.cpp               # Data containers
     ${SOURCE_DIR}/containers/atom_kdtree.cpp
     ${SOURCE_DIR}/containers/dump_data_container.cpp
-    ${SOURCE_DIR}/read_write/read_file.cpp
-    ${SOURCE_DIR}/utils/string_to_vec.cpp
+    ${SOURCE_DIR}/read_write/read_file.cpp                  # Read & write files
+    ${SOURCE_DIR}/read_write/write_file.cpp
+    ${SOURCE_DIR}/utils/string_to_vec.cpp                   # Utility files
     ${SOURCE_DIR}/utils/ddc_id_sort.cpp
 )
 

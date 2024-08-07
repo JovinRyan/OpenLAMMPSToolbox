@@ -7,6 +7,7 @@
 #include "read_write/read_file.h"
 #include "calculations/ddc_get_displacement.h"
 #include "utils/ddc_id_sort.h"
+#include "read_write/write_file.h"
 
 int main(int argc, char **argv)
 {
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
   std::ifstream infile;
   std::string ftype = "";
   std::string function = "";
+  bool write_file = false;
   double disp_threshold = 1;
 
   int p = 0;
@@ -28,6 +30,8 @@ int main(int argc, char **argv)
   olt.add_option("--function", function, "Post-Processing Function");
 
   olt.add_option("--disp_threshold", disp_threshold, "Lattice Parameter");
+
+  olt.add_flag("-w", write_file, "Write File Flag");
 
   CLI11_PARSE(olt, argc, argv);
 
@@ -44,11 +48,13 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  if (ftype == "custom" & function == "id_sort")
+  if (ftype == "custom" & function == "id_sort" & write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile);
 
     ddc_id_quicksort(custom_ddc);
+
+    ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
   }
 
   return 0;
