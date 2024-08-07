@@ -6,6 +6,7 @@
 #include "containers/dump_data_container.h"
 #include "read_write/read_file.h"
 #include "calculations/ddc_get_displacement.h"
+#include "utils/ddc_id_sort.h"
 
 int main(int argc, char **argv)
 {
@@ -35,6 +36,19 @@ int main(int argc, char **argv)
     dump_data_container xyz_ddc = xyzToDumpData(infile);
 
     std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, disp_threshold);
+  }
+
+  if (ftype == "xyz" & function == "id_sort")
+  {
+    std::cerr << "Files of type XYZ are ID sorted by default.";
+    return 1;
+  }
+
+  if (ftype == "custom" & function == "id_sort")
+  {
+    dump_data_container custom_ddc = customToDumpData(infile);
+
+    ddc_id_quicksort(custom_ddc);
   }
 
   return 0;
