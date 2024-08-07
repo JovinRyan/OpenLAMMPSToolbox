@@ -24,6 +24,7 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/containers/dump_data_container.cpp
     ${SOURCE_DIR}/read_write/read_file.cpp
     ${SOURCE_DIR}/utils/string_to_vec.cpp
+    ${SOURCE_DIR}/utils/ddc_id_sort.cpp
 )
 
 set(MAIN_SOURCE_FILE
