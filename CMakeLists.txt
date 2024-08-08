@@ -25,7 +25,7 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/read_write/read_file.cpp                  # Read & write files
     ${SOURCE_DIR}/read_write/write_file.cpp
     ${SOURCE_DIR}/utils/string_to_vec.cpp                   # Utility files
-    ${SOURCE_DIR}/utils/ddc_id_sort.cpp
+    ${SOURCE_DIR}/utils/ddc_sort.cpp
     ${SOURCE_DIR}/utils/sort_checker.cpp
 )
 
