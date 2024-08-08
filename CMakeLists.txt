@@ -27,6 +27,8 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/utils/string_to_vec.cpp                   # Utility files
     ${SOURCE_DIR}/utils/ddc_sort.cpp
     ${SOURCE_DIR}/utils/sort_checker.cpp
+    ${SOURCE_DIR}/utils/string_to_atom.cpp
+    ${SOURCE_DIR}/utils/ddc_reset_id.cpp
 )
 
 set(MAIN_SOURCE_FILE
