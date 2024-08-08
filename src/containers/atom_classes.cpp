@@ -30,3 +30,7 @@ double atom_pe_ke::get_total_energy()
 {
   return pe + ke;
 }
+
+atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec) : atom(ID, Type, x, y, z), atom_compute(C_vec)
+{
+}

@@ -33,3 +33,12 @@ public:
   double get_pe() const;
   double get_ke() const;
 };
+
+class atom_varying : atom
+{
+private:
+public:
+  std::vector<double> atom_compute;
+
+  atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec);
+};
