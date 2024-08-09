@@ -49,7 +49,7 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
   return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec, frame_boxbounds_vec);
 }
 
-dump_data_container customToDumpData(std::ifstream &infile)
+dump_data_container customToDumpData(std::ifstream &infile, std::string atom_flag)
 {
   std::vector<int> infileindexes;
   std::vector<int> atomscount_vec;
@@ -85,7 +85,7 @@ dump_data_container customToDumpData(std::ifstream &infile)
       timesteps_vec.push_back(std::stod(line));
     }
     // Finding box bounds
-    // Explicitly given in the files
+    // Explicitly given in the custom dump files
     if (line.find("ITEM: BOX BOUNDS") != std::string::npos)
     {
       std::vector<std::pair<double, double>> frame_bb;
@@ -117,7 +117,18 @@ dump_data_container customToDumpData(std::ifstream &infile)
     {
       std::vector<std::string> temp_vec = string_to_vec(parsedfile[j]);
 
-      frame_atoms_vec[i].push_back(atom(stoi(temp_vec[0]), stoi(temp_vec[1]), stod(temp_vec[2]), stod(temp_vec[3]), stod(temp_vec[4])));
+      if (atom_flag == "varying")
+      {
+        frame_atoms_vec[i].push_back(custom_str_to_atom_varying(parsedfile[j]));
+      }
+      // else if (atom_flag == "pe_ke")
+      // {
+      //   frame_atoms_vec[i].push_back(custom_str_to_atom_pe_ke(parsedfile[j]));
+      // }
+      else
+      {
+        frame_atoms_vec[i].push_back(custom_str_to_atom(parsedfile[j]));
+      }
     }
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }

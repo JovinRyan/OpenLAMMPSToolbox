@@ -19,6 +19,11 @@ double atom::get_distance(const atom &ref_atom)
               (z_coord - ref_atom.z_coord) * (z_coord - ref_atom.z_coord));
 }
 
+void atom::write(std::ostream &stream) const noexcept
+{
+  stream << id << " " << type << " " << x_coord << " " << y_coord << " " << z_coord << "\n";
+}
+
 atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
 {
 }
@@ -31,6 +36,17 @@ double atom_pe_ke::get_total_energy()
   return pe + ke;
 }
 
-atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec) : atom(ID, Type, x, y, z), atom_compute(C_vec)
+atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec) : atom(ID, Type, x, y, z), atom_compute(std::move(C_vec))
 {
+}
+
+void atom_varying::write(std::ostream &stream) const noexcept
+{
+  atom::write(stream);
+  stream << "Computed Values: ";
+  for (const auto &value : atom_compute)
+  {
+    stream << value << " ";
+  }
+  stream << "\n";
 }

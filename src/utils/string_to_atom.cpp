@@ -7,7 +7,7 @@ atom custom_str_to_atom(std::string in_line)
   return atom(stoi(line_vec[0]), stoi(line_vec[1]), stod(line_vec[2]), stod(line_vec[3]), stod(line_vec[4]));
 }
 
-atom_varying custom_str_vec_to_atom_varying(std::string in_line)
+atom_varying custom_str_to_atom_varying(std::string in_line)
 {
   std::vector<std::string> line_vec = string_to_vec(in_line);
   std::vector<double> compute_vec;

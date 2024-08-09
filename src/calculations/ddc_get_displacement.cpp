@@ -3,6 +3,7 @@
 std::vector<int> get_displacement_vec(dump_data_container in_dump, double disp_threshold)
 {
   std::vector<int> displacement_vec;
+  std::vector<atom> displacement_atoms_vec;
 
   std::vector<std::vector<atom>> fa_vec = in_dump.frame_atoms_vec;
 

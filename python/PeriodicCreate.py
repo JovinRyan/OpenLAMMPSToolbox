@@ -4,9 +4,9 @@ import numpy as np
 from DFStructureFileWrite import DFStructFileWrite
 from CrystalPointsDict import getStruct_Points
 
-DIM_x = 50
-DIM_y = 100
-DIM_z = 100
+DIM_x = 100
+DIM_y = 50
+DIM_z = 50
 
 BCC_points = getStruct_Points("BCC")
 
@@ -66,4 +66,5 @@ def populateLatticePoints3D(Latt_Points,  DimX, DimY, DimZ, LP_a, LP_b, LP_c):
 
   return CoordsDF
 
-DFStructFileWrite(populateLatticePoints3D(BCC_points, DIM_x, DIM_y, DIM_z, LATTICE_PARAM_a, LATTICE_PARAM_a, LATTICE_PARAM_a), "TestFile.lmp")
+DFStructFileWrite(populateLatticePoints3D(BCC_points, DIM_x, DIM_y, DIM_z, LATTICE_PARAM_a, LATTICE_PARAM_a, LATTICE_PARAM_a),
+                   "TestFile.lmp", LATTICE_PARAM_a/2, LATTICE_PARAM_a/2, LATTICE_PARAM_a/2)

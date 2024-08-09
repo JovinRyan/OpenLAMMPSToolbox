@@ -57,7 +57,7 @@ atom_kdtree::atom_kdtree(const std::vector<atom> &atom_vec)
   root = build_atom_kdtree(atom_vec_copy, 0, 0, atom_vec_copy.size());
 }
 
-atom atom_kdtree::find_nn(atom &target_atom) const
+atom atom_kdtree::get_nn(atom &target_atom) const
 {
   if (root == nullptr)
   {
