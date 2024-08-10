@@ -1,16 +1,16 @@
 #include "containers/dump_data_container.h"
 
 dump_data_container::dump_data_container(std::vector<double> t_vec, std::vector<int> ac_vec,
-                                         std::vector<std::vector<atom>> fa_vec, std::vector<std::vector<std::pair<double, double>>> f_bb_vec)
-    : timestep_vec(t_vec), atomscount_vec(ac_vec), frame_atoms_vec(fa_vec), frame_box_bounds_vec(f_bb_vec)
+                                         std::vector<std::vector<std::unique_ptr<atom>>> fa_vec, std::vector<std::vector<std::pair<double, double>>> f_bb_vec)
+    : timestep_vec(t_vec), atomscount_vec(ac_vec), frame_atoms_vec(std::move(fa_vec)), frame_box_bounds_vec(f_bb_vec), max_boxbounds(3)
 {
 }
 
-std::vector<double> dump_data_container::get_timestep_vec() { return timestep_vec; }
+std::vector<double> &dump_data_container::get_timestep_vec() { return timestep_vec; }
 
-std::vector<int> dump_data_container::get_atomscount_vec() { return atomscount_vec; }
+std::vector<int> &dump_data_container::get_atomscount_vec() { return atomscount_vec; }
 
-std::vector<std::pair<double, double>> dump_data_container::get_max_boxbounds()
+const std::vector<std::pair<double, double>> &dump_data_container::get_max_boxbounds()
 {
     std::pair<double, double> x_bounds = frame_box_bounds_vec[0][0];
     std::pair<double, double> y_bounds = frame_box_bounds_vec[0][1];
@@ -50,5 +50,13 @@ std::vector<std::pair<double, double>> dump_data_container::get_max_boxbounds()
         }
     }
 
-    return std::vector<std::pair<double, double>>{x_bounds, y_bounds, z_bounds};
+    max_boxbounds[0] = x_bounds;
+    max_boxbounds[1] = y_bounds;
+    max_boxbounds[2] = z_bounds;
+
+    return max_boxbounds;
 }
+
+// std::pair<std::vector<int>, std::vector<int>> get_displacements(double disp_threshold)
+// {
+// }

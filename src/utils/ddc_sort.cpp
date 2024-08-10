@@ -2,9 +2,9 @@
 
 // ID
 
-int id_partition(std::vector<atom> &in_atom_vec, int low, int high)
+int id_partition(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
-  int pivot = in_atom_vec[low].get_id();
+  int pivot = in_atom_vec[low].get()->get_id();
   int i = low - 1;
   int j = high + 1;
 
@@ -13,11 +13,11 @@ int id_partition(std::vector<atom> &in_atom_vec, int low, int high)
     do
     {
       i++;
-    } while (in_atom_vec[i].get_id() < pivot);
+    } while (in_atom_vec[i].get()->get_id() < pivot);
     do
     {
       j--;
-    } while (in_atom_vec[j].get_id() > pivot);
+    } while (in_atom_vec[j].get()->get_id() > pivot);
 
     if (i >= j)
       return j;
@@ -26,7 +26,7 @@ int id_partition(std::vector<atom> &in_atom_vec, int low, int high)
   }
 }
 
-void atom_vec_quicksort_by_id(std::vector<atom> &in_atom_vec, int low, int high)
+void atom_vec_quicksort_by_id(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
   if (low < high)
   {
@@ -51,9 +51,9 @@ void ddc_id_quicksort(dump_data_container &in_ddc)
 
 // X Coord
 
-int x_partition(std::vector<atom> &in_atom_vec, int low, int high)
+int x_partition(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
-  double pivot = in_atom_vec[low].get_coords()[0];
+  double pivot = in_atom_vec[low]->get_coords()[0];
   int i = low - 1;
   int j = high + 1;
 
@@ -62,11 +62,11 @@ int x_partition(std::vector<atom> &in_atom_vec, int low, int high)
     do
     {
       i++;
-    } while (in_atom_vec[i].get_coords()[0] < pivot);
+    } while (in_atom_vec[i]->get_coords()[0] < pivot);
     do
     {
       j--;
-    } while (in_atom_vec[j].get_coords()[0] > pivot);
+    } while (in_atom_vec[j]->get_coords()[0] > pivot);
 
     if (i >= j)
       return j;
@@ -75,7 +75,7 @@ int x_partition(std::vector<atom> &in_atom_vec, int low, int high)
   }
 }
 
-void atom_vec_quicksort_by_x(std::vector<atom> &in_atom_vec, int low, int high)
+void atom_vec_quicksort_by_x(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
   if (low < high)
   {
@@ -100,9 +100,9 @@ void ddc_x_quicksort(dump_data_container &in_ddc)
 
 // Y Coord
 
-int y_partition(std::vector<atom> &in_atom_vec, int low, int high)
+int y_partition(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
-  double pivot = in_atom_vec[low].get_coords()[1];
+  double pivot = in_atom_vec[low]->get_coords()[1];
   int i = low - 1;
   int j = high + 1;
 
@@ -111,11 +111,11 @@ int y_partition(std::vector<atom> &in_atom_vec, int low, int high)
     do
     {
       i++;
-    } while (in_atom_vec[i].get_coords()[1] < pivot);
+    } while (in_atom_vec[i]->get_coords()[1] < pivot);
     do
     {
       j--;
-    } while (in_atom_vec[j].get_coords()[1] > pivot);
+    } while (in_atom_vec[j]->get_coords()[1] > pivot);
 
     if (i >= j)
       return j;
@@ -124,7 +124,7 @@ int y_partition(std::vector<atom> &in_atom_vec, int low, int high)
   }
 }
 
-void atom_vec_quicksort_by_y(std::vector<atom> &in_atom_vec, int low, int high)
+void atom_vec_quicksort_by_y(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
   if (low < high)
   {
@@ -149,9 +149,9 @@ void ddc_y_quicksort(dump_data_container &in_ddc)
 
 // Z Coord
 
-int z_partition(std::vector<atom> &in_atom_vec, int low, int high)
+int z_partition(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
-  double pivot = in_atom_vec[low].get_coords()[2];
+  double pivot = in_atom_vec[low]->get_coords()[2];
   int i = low - 1;
   int j = high + 1;
 
@@ -160,11 +160,11 @@ int z_partition(std::vector<atom> &in_atom_vec, int low, int high)
     do
     {
       i++;
-    } while (in_atom_vec[i].get_coords()[2] < pivot);
+    } while (in_atom_vec[i]->get_coords()[2] < pivot);
     do
     {
       j--;
-    } while (in_atom_vec[j].get_coords()[2] > pivot);
+    } while (in_atom_vec[j]->get_coords()[2] > pivot);
 
     if (i >= j)
       return j;
@@ -173,7 +173,7 @@ int z_partition(std::vector<atom> &in_atom_vec, int low, int high)
   }
 }
 
-void atom_vec_quicksort_by_z(std::vector<atom> &in_atom_vec, int low, int high)
+void atom_vec_quicksort_by_z(std::vector<std::unique_ptr<atom>> &in_atom_vec, int low, int high)
 {
   if (low < high)
   {

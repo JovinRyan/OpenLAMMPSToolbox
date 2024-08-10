@@ -1,11 +1,12 @@
 #include "calculations/ddc_get_displacement.h"
+#include "containers/dump_data_container.h"
 
-std::vector<int> get_displacement_vec(dump_data_container in_dump, double disp_threshold)
+std::vector<int> get_displacement_vec(dump_data_container &in_dump, double disp_threshold)
 {
   std::vector<int> displacement_vec;
   std::vector<atom> displacement_atoms_vec;
 
-  std::vector<std::vector<atom>> fa_vec = in_dump.frame_atoms_vec;
+  std::vector<std::vector<std::unique_ptr<atom>>> &fa_vec = in_dump.frame_atoms_vec;
 
   std::cout << "Calculating # of Atoms Displaced >= " << disp_threshold << " units." << "\n";
 
@@ -14,7 +15,7 @@ std::vector<int> get_displacement_vec(dump_data_container in_dump, double disp_t
     int count = 0;
     for (int j = 0; j < size(fa_vec[i]); j++)
     {
-      if (fa_vec[i][j].get_distance(fa_vec[0][j]) >= disp_threshold)
+      if (fa_vec[i][j]->get_distance(*fa_vec[0][j]) >= disp_threshold)
       {
         count++;
       }

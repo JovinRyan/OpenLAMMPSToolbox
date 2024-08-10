@@ -1,10 +1,10 @@
 #include "utils/ddc_reset_id.h"
 
-void atom_vec_reset_id(std::vector<atom> &in_atom_vec)
+void atom_vec_reset_id(std::vector<std::unique_ptr<atom>> &in_atom_vec)
 {
   for (int i = 0; i < size(in_atom_vec); i++)
   {
-    in_atom_vec[i].id = i + 1;
+    in_atom_vec[i]->id = i + 1;
   }
 }
 

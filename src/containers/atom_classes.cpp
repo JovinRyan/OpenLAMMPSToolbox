@@ -21,7 +21,11 @@ double atom::get_distance(const atom &ref_atom)
 
 void atom::write(std::ostream &stream) const noexcept
 {
-  stream << id << " " << type << " " << x_coord << " " << y_coord << " " << z_coord << "\n";
+  stream << id << " " << type << " " << x_coord << " " << y_coord << " " << z_coord;
+}
+
+void atom::write_compute_types(std::ostream &stream) const noexcept
+{
 }
 
 atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
@@ -43,10 +47,16 @@ atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::
 void atom_varying::write(std::ostream &stream) const noexcept
 {
   atom::write(stream);
-  stream << "Computed Values: ";
   for (const auto &value : atom_compute)
   {
-    stream << value << " ";
+    stream << " " << value << " ";
   }
-  stream << "\n";
+}
+
+void atom_varying::write_compute_types(std::ostream &stream) const noexcept
+{
+  for (int i = 0; i < size(atom_compute); i++)
+  {
+    stream << " " << "var_" << i + 1;
+  }
 }
