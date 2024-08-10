@@ -3,6 +3,7 @@
 #include <vector>
 #include <random>
 #include <iostream>
+#include <memory>
 
 #include "containers/atom_classes.h"
 

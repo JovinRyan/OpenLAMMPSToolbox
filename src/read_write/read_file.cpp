@@ -34,19 +34,20 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
     frameindexpairs.push_back(std::make_pair(infileindexes[i] + 1, infileindexes[i] + atomscount_vec[0]));
   }
 
-  std::vector<std::vector<atom>> frame_atoms_vec(size(frameindexpairs));
+  std::vector<std::vector<std::unique_ptr<atom>>> frame_atoms_vec(size(frameindexpairs));
 
   for (int i = 0; i < size(frame_atoms_vec); i++)
   {
     int start_index = frameindexpairs[i].first, stop_index = frameindexpairs[i].second;
     for (int j = start_index - 1; j < stop_index; j++)
     {
-      frame_atoms_vec[i].push_back(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]), stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3])));
+      frame_atoms_vec[i].push_back(std::make_unique<atom>(atom(j - (start_index - 2), stoi(string_to_vec(parsedfile[j])[0]), stod(string_to_vec(parsedfile[j])[1]),
+                                                               stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3]))));
     } /* Sloppy numbering for ID but it works */
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }
 
-  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec, frame_boxbounds_vec);
+  return dump_data_container(timesteps_vec, atomscount_vec, std::move(frame_atoms_vec), frame_boxbounds_vec);
 }
 
 dump_data_container customToDumpData(std::ifstream &infile, std::string atom_flag)
@@ -107,7 +108,7 @@ dump_data_container customToDumpData(std::ifstream &infile, std::string atom_fla
     frameindexpairs.push_back(std::make_pair(infileindexes[i], infileindexes[i] + atomscount_vec[i])); // Should account for varying atom count, needs testing
   }
 
-  std::vector<std::vector<atom>> frame_atoms_vec(size(frameindexpairs));
+  std::vector<std::vector<std::unique_ptr<atom>>> frame_atoms_vec(size(frameindexpairs));
 
   for (int i = 0; i < size(frame_atoms_vec); i++)
   {
@@ -119,7 +120,7 @@ dump_data_container customToDumpData(std::ifstream &infile, std::string atom_fla
 
       if (atom_flag == "varying")
       {
-        frame_atoms_vec[i].push_back(custom_str_to_atom_varying(parsedfile[j]));
+        frame_atoms_vec[i].push_back(std::make_unique<atom_varying>(custom_str_to_atom_varying(parsedfile[j])));
       }
       // else if (atom_flag == "pe_ke")
       // {
@@ -127,11 +128,11 @@ dump_data_container customToDumpData(std::ifstream &infile, std::string atom_fla
       // }
       else
       {
-        frame_atoms_vec[i].push_back(custom_str_to_atom(parsedfile[j]));
+        frame_atoms_vec[i].push_back(std::make_unique<atom>(custom_str_to_atom(parsedfile[j])));
       }
     }
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }
 
-  return dump_data_container(timesteps_vec, atomscount_vec, frame_atoms_vec, frame_boxbounds_vec);
+  return dump_data_container(timesteps_vec, atomscount_vec, std::move(frame_atoms_vec), frame_boxbounds_vec);
 }
