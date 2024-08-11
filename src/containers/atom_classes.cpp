@@ -4,7 +4,11 @@ atom::atom(int ID, int Type, double x, double y, double z) : id(ID), type(Type),
 {
 }
 
-std::vector<double> atom::get_coords()
+atom::atom(const atom &original_atom) : id(original_atom.get_id()), type(original_atom.get_type()), x_coord(original_atom.get_coords()[0]), y_coord(original_atom.get_coords()[1]), z_coord(original_atom.get_coords()[2])
+{
+}
+
+std::vector<double> atom::get_coords() const
 {
   return {x_coord, y_coord, z_coord};
 }
@@ -46,6 +50,10 @@ double atom_pe_ke::get_total_energy()
 }
 
 atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec) : atom(ID, Type, x, y, z), atom_compute(std::move(C_vec))
+{
+}
+
+atom_varying::atom_varying(const atom_varying &original_atom) : atom(original_atom), atom_compute(original_atom.get_compute_vec())
 {
 }
 
