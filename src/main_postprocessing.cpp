@@ -45,20 +45,20 @@ int main(int argc, char **argv)
 
   CLI11_PARSE(olt, argc, argv);
 
-  if (ftype == "xyz" & function == "displacement")
+  if (ftype == "xyz" && function == "displacement")
   {
     dump_data_container xyz_ddc = xyzToDumpData(infile);
 
     std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, disp_threshold);
   }
 
-  else if (ftype == "xyz" & function == "id_sort")
+  else if (ftype == "xyz" && function == "id_sort")
   {
     std::cerr << "Files of type XYZ are ID sorted by default.";
     return 1;
   }
 
-  else if (ftype == "custom" & function == "id_sort" & write_file)
+  else if (ftype == "custom" && function == "id_sort" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
   }
 
-  else if (ftype == "custom" & function == "x_sort" & write_file)
+  else if (ftype == "custom" && function == "x_sort" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
   }
 
-  else if (ftype == "custom" & function == "compute_sort" & write_file)
+  else if (ftype == "custom" && function == "compute_sort" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
   }
 
-  else if (ftype == "custom" & selection_vec[0] == "compute" & selection_vec[2] == "greater_than")
+  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "greater_than")
   {
     int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
     double threshold = stod(selection_vec[3]);
@@ -95,13 +95,20 @@ int main(int argc, char **argv)
     ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index);
   }
 
-  // else
-  // {
-  //   for (int i = 0; i < size(selection_vec); i++)
-  //   {
-  //     std::cout << selection_vec[i] << " ";
-  //   }
-  // }
+  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "less_than")
+  {
+    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
+    double threshold = stod(selection_vec[3]);
+
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_compute_delta_selection_less_than(custom_ddc, threshold, compute_index);
+  }
+
+  else
+  {
+    throw std::runtime_error("Improper Input. See User Guide at https://github.com/JovinRyan/OpenLAMMPSToolbox or Use the Help Command (--help).");
+  }
 
   return 0;
 }

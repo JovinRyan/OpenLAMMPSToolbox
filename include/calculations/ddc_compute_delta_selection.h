@@ -9,4 +9,6 @@
 
 std::pair<std::vector<int>, std::vector<int>> ddc_compute_delta_selection_greater_than(dump_data_container &in_dump, double threshold, int compute_index);
 
+std::pair<std::vector<int>, std::vector<int>> ddc_compute_delta_selection_less_than(dump_data_container &in_dump, double threshold, int compute_index);
+
 #endif
