@@ -30,6 +30,7 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/utils/sort_checker.cpp
     ${SOURCE_DIR}/utils/string_to_atom.cpp
     ${SOURCE_DIR}/utils/ddc_reset_id.cpp
+    ${SOURCE_DIR}/utils/ddc_subset_creator.cpp
 )
 
 set(MAIN_SOURCE_FILE

@@ -8,6 +8,7 @@
 #include "calculations/ddc_compute_delta_selection.h"
 #include "utils/ddc_sort.h"
 #include "utils/sort_checker.h"
+#include "utils/ddc_subset_creator.h"
 #include "read_write/write_file.h"
 #include "read_write/read_file.h"
 
@@ -20,6 +21,7 @@ int main(int argc, char **argv)
   std::string ftype = "";
   std::string function = "";
   std::string atom_flag = "";
+  std::string outfile;
 
   std::vector<std::string> selection_vec;
   bool write_file = false;
@@ -36,7 +38,9 @@ int main(int argc, char **argv)
 
   olt.add_option("--disp_threshold", disp_threshold, "Lattice Parameter");
 
-  olt.add_flag("-w", write_file, "Write File Flag");
+  olt.add_flag("-w, --write", write_file, "Write File Flag");
+
+  olt.add_option("--outfile", outfile, "Output File Name.");
 
   olt.add_option("--atom_flag", atom_flag, "Data Stored For Each Atom"); // atom_flag = {varying, pe_ke, }
 
@@ -85,6 +89,25 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
   }
 
+  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "greater_than" && write_file)
+  {
+    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
+    double threshold = stod(selection_vec[3]);
+
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    std::vector<int> id_vec = ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
+
+    if (outfile == "")
+    {
+      outfile = string_to_vec(argv[1], ".")[0] + "_processed" + string_to_vec(argv[1], ".")[2]; // must have only one "." character
+    }
+
+    ddc_to_custom_dump(subset_ddc, outfile);
+  }
+
   else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "greater_than")
   {
     int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
@@ -93,6 +116,25 @@ int main(int argc, char **argv)
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
     ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index);
+  }
+
+  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "less_than" && write_file)
+  {
+    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
+    double threshold = stod(selection_vec[3]);
+
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    std::vector<int> id_vec = ddc_compute_delta_selection_less_than(custom_ddc, threshold, compute_index).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
+
+    if (outfile == "")
+    {
+      outfile = string_to_vec(argv[1], ".")[0] + "_processed" + string_to_vec(argv[1], ".")[2]; // must have only one "." character
+    }
+
+    ddc_to_custom_dump(subset_ddc, outfile);
   }
 
   else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "less_than")
