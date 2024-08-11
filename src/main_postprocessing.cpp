@@ -70,5 +70,14 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
   }
 
+  if (ftype == "custom" & function == "compute_sort" & write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_compute_quicksort(custom_ddc, 0);
+
+    ddc_to_custom_dump(custom_ddc, "test_custom_ddc.lmp");
+  }
+
   return 0;
 }

@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <ostream>
+#include <stdexcept>
 
 class atom
 {
@@ -24,6 +25,8 @@ public:
   void virtual write(std::ostream &stream) const noexcept;
 
   void virtual write_compute_types(std::ostream &stream) const noexcept;
+
+  virtual std::vector<double> get_compute_vec() const;
 };
 
 class atom_pe_ke : public atom
@@ -48,5 +51,8 @@ public:
   atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec);
 
   void write(std::ostream &stream) const noexcept override;
+
   void write_compute_types(std::ostream &stream) const noexcept override;
+
+  std::vector<double> get_compute_vec() const noexcept override;
 };

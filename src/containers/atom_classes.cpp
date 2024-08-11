@@ -28,6 +28,11 @@ void atom::write_compute_types(std::ostream &stream) const noexcept
 {
 }
 
+std::vector<double> atom::get_compute_vec() const
+{
+  throw std::runtime_error("get_compute_vec is not implemented for base class atom");
+}
+
 atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
 {
 }
@@ -59,4 +64,9 @@ void atom_varying::write_compute_types(std::ostream &stream) const noexcept
   {
     stream << " " << "var_" << i + 1;
   }
+}
+
+std::vector<double> atom_varying::get_compute_vec() const noexcept
+{
+  return atom_compute;
 }

@@ -25,10 +25,6 @@ void ddc_to_custom_dump(dump_data_container &in_dump, std::string fname)
 
     for (int j = 0; j < size(in_dump.frame_atoms_vec[i]); j++)
     {
-      // outfile << in_dump.frame_atoms_vec[i][j].get_id() << " " << in_dump.frame_atoms_vec[i][j].get_type() << " "
-      //         << in_dump.frame_atoms_vec[i][j].get_coords()[0] << " " << in_dump.frame_atoms_vec[i][j].get_coords()[1] << " "
-      //         << in_dump.frame_atoms_vec[i][j].get_coords()[2] << "\n";
-
       in_dump.frame_atoms_vec[i][j]->write(outfile);
       outfile << "\n";
     }
