@@ -32,6 +32,7 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/utils/string_to_atom.cpp
     ${SOURCE_DIR}/utils/ddc_reset_id.cpp
     ${SOURCE_DIR}/utils/ddc_subset_creator.cpp
+    ${SOURCE_DIR}/utils/vector_utils.cpp
 )
 
 set(MAIN_SOURCE_FILE
@@ -39,5 +40,10 @@ set(MAIN_SOURCE_FILE
 )
 
 add_executable(olt_postprocessing ${MAIN_SOURCE_FILE} ${SOURCE_FILES})
+
+set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
+
+set(TEST_FILES
+)
 
 include_directories(${INCLUDE_DIR})
