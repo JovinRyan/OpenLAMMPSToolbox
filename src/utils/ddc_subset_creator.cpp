@@ -5,7 +5,7 @@ std::vector<std::unique_ptr<atom>> atom_subset_from_id(std::vector<std::unique_p
   std::vector<std::unique_ptr<atom>> atom_subset_vec;
   for (int i = 0; i < size(id_vec); i++)
   {
-    atom_subset_vec.push_back(std::move(frame[id_vec[i] - 1]->clone()));
+    atom_subset_vec.push_back(frame[id_vec[i] - 1]->clone());
   }
 
   return atom_subset_vec;
