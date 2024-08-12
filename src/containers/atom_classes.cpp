@@ -8,6 +8,11 @@ atom::atom(const atom &original_atom) : id(original_atom.get_id()), type(origina
 {
 }
 
+std::unique_ptr<atom> atom::clone()
+{
+  return std::make_unique<atom>(*this);
+}
+
 std::vector<double> atom::get_coords() const
 {
   return {x_coord, y_coord, z_coord};
@@ -34,7 +39,7 @@ void atom::write_compute_types(std::ostream &stream) const noexcept
 
 std::vector<double> atom::get_compute_vec() const
 {
-  throw std::runtime_error("get_compute_vec is not implemented for base class atom");
+  throw std::runtime_error("get_compute_vec is Not Implemented for Base Class \"atom\"\n");
 }
 
 atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
@@ -55,6 +60,11 @@ atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::
 
 atom_varying::atom_varying(const atom_varying &original_atom) : atom(original_atom), atom_compute(original_atom.get_compute_vec())
 {
+}
+
+std::unique_ptr<atom> atom_varying::clone()
+{
+  return std::make_unique<atom_varying>(*this);
 }
 
 void atom_varying::write(std::ostream &stream) const noexcept

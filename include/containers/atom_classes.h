@@ -4,6 +4,7 @@
 #include <cmath>
 #include <ostream>
 #include <stdexcept>
+#include <memory>
 
 class atom
 {
@@ -28,7 +29,9 @@ public:
 
   void virtual write_compute_types(std::ostream &stream) const noexcept;
 
-  virtual std::vector<double> get_compute_vec() const;
+  std::vector<double> virtual get_compute_vec() const;
+
+  std::unique_ptr<atom> virtual clone();
 };
 
 class atom_pe_ke : public atom
@@ -59,4 +62,6 @@ public:
   void write_compute_types(std::ostream &stream) const noexcept override;
 
   std::vector<double> get_compute_vec() const noexcept override;
+
+  std::unique_ptr<atom> clone() override;
 };
