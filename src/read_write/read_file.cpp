@@ -122,10 +122,7 @@ dump_data_container customToDumpData(std::ifstream &infile, std::string atom_fla
       {
         frame_atoms_vec[i].push_back(std::make_unique<atom_varying>(custom_str_to_atom_varying(parsedfile[j])));
       }
-      // else if (atom_flag == "pe_ke")
-      // {
-      //   frame_atoms_vec[i].push_back(custom_str_to_atom_pe_ke(parsedfile[j]));
-      // }
+
       else
       {
         frame_atoms_vec[i].push_back(std::make_unique<atom>(custom_str_to_atom(parsedfile[j])));
