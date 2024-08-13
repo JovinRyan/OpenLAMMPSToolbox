@@ -15,6 +15,7 @@
 atom_disp_test
 OpenLAMMPSToolbox
 olt_*
+run_*
 
 
 # CMake files
