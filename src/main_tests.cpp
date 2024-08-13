@@ -2,8 +2,14 @@
 
 #include "tests/doctest.h"
 #include "tests/atom_quicksort_test.h"
+#include "tests/atom_method_test.h"
 
 TEST_CASE("Atom QuickSort Test")
 {
   CHECK(atom_quicksort_test);
+}
+
+TEST_CASE("Atom Get Distance Test")
+{
+  CHECK(atom_dist_test());
 }
