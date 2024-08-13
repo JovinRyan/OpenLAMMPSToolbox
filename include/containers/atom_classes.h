@@ -34,19 +34,6 @@ public:
   std::unique_ptr<atom> virtual clone();
 };
 
-class atom_pe_ke : public atom
-{
-private:
-public:
-  double pe;
-  double ke;
-  atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE);
-  double get_total_energy();
-
-  double get_pe() const;
-  double get_ke() const;
-};
-
 class atom_varying : public atom
 {
 private:

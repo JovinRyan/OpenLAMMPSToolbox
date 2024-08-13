@@ -8,6 +8,4 @@
 
 atom custom_str_to_atom(std::string in_line);
 
-atom_pe_ke custom_str_to_atom_pe_ke(std::string in_line);
-
 atom_varying custom_str_to_atom_varying(std::string in_line);

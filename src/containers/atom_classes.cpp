@@ -42,18 +42,6 @@ std::vector<double> atom::get_compute_vec() const
   throw std::runtime_error("get_compute_vec is Not Implemented for Base Class \"atom\"\n");
 }
 
-atom_pe_ke::atom_pe_ke(int ID, int Type, double x, double y, double z, double PE, double KE) : atom(ID, Type, x, y, z), pe(PE), ke(KE)
-{
-}
-
-double atom_pe_ke::get_pe() const { return pe; }
-double atom_pe_ke::get_ke() const { return ke; }
-
-double atom_pe_ke::get_total_energy()
-{
-  return pe + ke;
-}
-
 atom_varying::atom_varying(int ID, int Type, double x, double y, double z, std::vector<double> C_vec) : atom(ID, Type, x, y, z), atom_compute(std::move(C_vec))
 {
 }
