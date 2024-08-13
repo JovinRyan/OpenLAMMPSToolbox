@@ -10,6 +10,7 @@
 #include "utils/ddc_sort.h"
 #include "utils/sort_checker.h"
 #include "utils/ddc_subset_creator.h"
+#include "utils/vector_utils.h"
 #include "read_write/write_file.h"
 #include "read_write/read_file.h"
 
@@ -23,6 +24,8 @@ int main(int argc, char **argv)
   std::string function = "";
   std::string atom_flag = "";
   std::string outfile;
+
+  std::vector<double> macro_vec;
 
   std::vector<std::string> selection_vec;
   bool write_file = false;
@@ -48,11 +51,34 @@ int main(int argc, char **argv)
   olt.add_option("--selection, -s", selection_vec, "Command For All Selection/Subset Creation Processes. Selection is inclusive (>= and <=). Usage: --selection <Atom Parameter> <greater_than or less_than> <threshold>. If Atom Parameter = \"compute\" Additional <Index> Argument Required After <Atom Parameter>")
       ->expected(3, 4);
 
+  olt.add_option("--macro", macro_vec, "Set of Predefined Macros");
+
   CLI11_PARSE(olt, argc, argv);
 
   if (outfile == "")
   {
     outfile = string_to_vec(argv[2], ".")[0] + "_processed." + string_to_vec(argv[2], ".")[1]; // must have only one "." character
+  }
+
+  // Macro 1
+  if (macro_vec[0] == 1 && write_file && atom_flag == "varying") // --macro 1 compute_index delta_threshold compute_threshold
+                                                                 // Selects delta compute greater than and creates union with compute greater than
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    int compute_index = macro_vec[1] - 1;
+
+    std::vector<int> id_vec_a = ddc_compute_delta_selection_mag_greater_than(custom_ddc, macro_vec[2], compute_index).second;
+
+    std::vector<int> id_vec_b = ddc_compute_greater_than(custom_ddc, macro_vec[3], compute_index).second;
+
+    vector_add_from_vector(id_vec_a, id_vec_b);
+
+    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec_a);
+
+    ddc_to_custom_dump(subset_ddc, outfile);
+
+    return 0;
   }
 
   if (ftype == "xyz" && function == "displacement")

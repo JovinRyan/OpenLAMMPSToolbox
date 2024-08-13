@@ -29,4 +29,6 @@ void ddc_to_custom_dump(dump_data_container &in_dump, std::string fname)
       outfile << "\n";
     }
   }
+
+  outfile.close();
 }
