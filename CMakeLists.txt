@@ -44,6 +44,15 @@ add_executable(olt_postprocessing ${MAIN_SOURCE_FILE} ${SOURCE_FILES})
 set(TEST_DIR ${CMAKE_SOURCE_DIR}/tests)
 
 set(TEST_FILES
+    ${SOURCE_FILES}
+    ${TEST_DIR}/atom_quicksort_test.cpp
 )
+
+set(MAIN_TEST_FILE
+    ${SOURCE_DIR}/main_tests.cpp
+)
+
+add_executable(run_tests ${MAIN_TEST_FILE} ${TEST_FILES} )
+
 
 include_directories(${INCLUDE_DIR})
