@@ -21,9 +21,10 @@ int main(int argc, char **argv)
   // Defining options
   std::ifstream infile;
   std::string ftype = "";
-  std::string function = "";
   std::string atom_flag = "";
   std::string outfile;
+
+  std::pair<std::string, double> analysis(" ", 1.0);
 
   std::vector<double> macro_vec;
 
@@ -31,14 +32,11 @@ int main(int argc, char **argv)
   bool write_file = false;
   double disp_threshold = 1;
 
-  int p = 0;
   olt.add_option("--file, -f", infile, "Required LAMMPS Dump File")
       ->required()
       ->check(CLI::ExistingFile);
 
   olt.add_option("--file_type, -t", ftype, "Dump File Type");
-
-  olt.add_option("--function, --func", function, "Post-Processing Function");
 
   olt.add_option("--disp_threshold", disp_threshold, "Minimum Distance (Dump File Units) To Count as Atom Displacement");
 
@@ -51,6 +49,8 @@ int main(int argc, char **argv)
   olt.add_option("--selection, -s", selection_vec, "Command For All Selection/Subset Creation Processes. Selection is inclusive (>= and <=). Usage: --selection <Atom Parameter> <greater_than or less_than> <threshold>. If Atom Parameter = \"compute\" Additional <Index> Argument Required After <Atom Parameter>")
       ->expected(3, 4);
 
+  olt.add_option("--analysis, -a", analysis, "Analyses Such as Sorting, Finding Displaced Atoms, etc.");
+
   olt.add_option("--macro", macro_vec, "Set of Predefined Macros");
 
   CLI11_PARSE(olt, argc, argv);
@@ -61,49 +61,27 @@ int main(int argc, char **argv)
   }
 
   // Macro 1
-  if (macro_vec[0] == 1 && write_file && atom_flag == "varying") // --macro 1 compute_index delta_threshold compute_threshold
-                                                                 // Selects delta compute greater than and creates union with compute greater than
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+  // if (macro_vec[0] == 1 && write_file && atom_flag == "varying") // --macro 1 compute_index delta_threshold compute_threshold
+  //                                                                // Selects delta compute greater than and creates union with compute greater than
+  // {
+  //   dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
-    int compute_index = macro_vec[1] - 1;
+  //   int compute_index = macro_vec[1] - 1;
 
-    std::vector<int> id_vec_a = ddc_compute_delta_selection_mag_greater_than(custom_ddc, macro_vec[2], compute_index).second;
+  //   std::vector<int> id_vec_a = ddc_compute_delta_selection_mag_greater_than(custom_ddc, macro_vec[2], compute_index).second;
 
-    std::vector<int> id_vec_b = ddc_compute_greater_than(custom_ddc, macro_vec[3], compute_index).second;
+  //   std::vector<int> id_vec_b = ddc_compute_greater_than(custom_ddc, macro_vec[3], compute_index).second;
 
-    vector_add_from_vector(id_vec_a, id_vec_b);
+  //   vector_add_from_vector(id_vec_a, id_vec_b);
 
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec_a);
+  //   dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec_a);
 
-    ddc_to_custom_dump(subset_ddc, outfile);
+  //   ddc_to_custom_dump(subset_ddc, outfile);
 
-    return 0;
-  }
+  //   return 0;
+  // }
 
-  if (ftype == "xyz" && function == "displacement")
-  {
-    dump_data_container xyz_ddc = xyzToDumpData(infile);
-
-    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, disp_threshold);
-  }
-
-  else if (ftype == "xyz" && function == "id_sort")
-  {
-    std::cerr << "Files of type XYZ are ID sorted by default.";
-    return 1;
-  }
-
-  else if (ftype == "custom" && function == "id_sort" && write_file)
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && function == "x_sort" && write_file)
+  if (analysis.first == "sort_coordinate" && analysis.second == 1 && ftype == "custom" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
@@ -112,11 +90,67 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, outfile);
   }
 
-  else if (ftype == "custom" && function == "compute_sort" && write_file)
+  else if (analysis.first == "sort_coordinate" && analysis.second == 2 && ftype == "custom" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
-    ddc_compute_quicksort(custom_ddc, 0);
+    ddc_y_quicksort(custom_ddc);
+
+    ddc_to_custom_dump(custom_ddc, outfile);
+  }
+
+  else if (analysis.first == "sort_coordinate" && analysis.second == 3 && ftype == "custom" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_z_quicksort(custom_ddc);
+
+    ddc_to_custom_dump(custom_ddc, outfile);
+  }
+
+  else if (ftype == "xyz" && analysis.first == "displacement")
+  {
+    dump_data_container xyz_ddc = xyzToDumpData(infile);
+
+    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second);
+  }
+
+  else if (ftype == "custom" && analysis.first == "displacement")
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second);
+  }
+
+  else if (ftype == "xyz" && analysis.first == "id_sort")
+  {
+    std::cerr << "Files of type XYZ are ID sorted by default.";
+    return 1;
+  }
+
+  else if (ftype == "custom" && analysis.first == "id_sort" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_id_quicksort(custom_ddc);
+
+    ddc_to_custom_dump(custom_ddc, outfile);
+  }
+
+  else if (ftype == "custom" && analysis.first == "x_sort" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_x_quicksort(custom_ddc);
+
+    ddc_to_custom_dump(custom_ddc, outfile);
+  }
+
+  else if (ftype == "custom" && analysis.first == "compute_sort" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_compute_quicksort(custom_ddc, analysis.second);
 
     ddc_to_custom_dump(custom_ddc, outfile);
   }
