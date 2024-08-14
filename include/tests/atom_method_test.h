@@ -1,5 +1,3 @@
-#pragma once
-
 #include "containers/atom_classes.h"
 #include <random>
 #include <cmath>
