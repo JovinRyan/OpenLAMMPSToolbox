@@ -81,7 +81,22 @@ int main(int argc, char **argv)
   //   return 0;
   // }
 
-  if (analysis.first == "sort_coordinate" && analysis.second == 1 && ftype == "custom" && write_file)
+  if (ftype == "xyz" && analysis.first == "sort_id")
+  {
+    std::cerr << "Files of type XYZ are ID sorted by default.\n";
+    return 1;
+  }
+
+  else if (ftype == "custom" && analysis.first == "sort_id" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_id_quicksort(custom_ddc);
+
+    ddc_to_custom_dump(custom_ddc, outfile);
+  }
+
+  else if (analysis.first == "sort_coordinate" && analysis.second == 1 && ftype == "custom" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
@@ -122,31 +137,7 @@ int main(int argc, char **argv)
     std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second);
   }
 
-  else if (ftype == "xyz" && analysis.first == "id_sort")
-  {
-    std::cerr << "Files of type XYZ are ID sorted by default.";
-    return 1;
-  }
-
-  else if (ftype == "custom" && analysis.first == "id_sort" && write_file)
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && analysis.first == "x_sort" && write_file)
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_x_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && analysis.first == "compute_sort" && write_file)
+  else if (ftype == "custom" && analysis.first == "sort_compute" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
@@ -154,6 +145,8 @@ int main(int argc, char **argv)
 
     ddc_to_custom_dump(custom_ddc, outfile);
   }
+
+  // Selection type operation.
 
   else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "greater_than" && write_file)
   {
