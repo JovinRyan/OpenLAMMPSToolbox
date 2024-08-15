@@ -12,7 +12,7 @@ OpenLAMMPSToolbox is a collection of CLI tools used for pre- and post processing
 Dump file format = ```custom``` or ```xyz```. <br>
 Analysis function = ```sort_id``` or ```sort_coordinate``` or ```sort_compute```. <br>
 Index corresponds to coordinate and compute index (1-sorted). ```1``` for X coordinate with ```sort_coordinate```, ```2``` for the second compute variable in the LAMMPS dump file with ```sort_compute```. Any numerical value can be provided for ```sort_id``` which will be ignored. <br> 
-```-w``` should be included if you wish to write the resulting sorted LAMMPS dump file.
+```-w``` should be included if you wish to write the resulting sorted LAMMPS dump file. (Required for all sorting type analysis.) <br>
 Note: QuickSort is used to perform the sorting operation. It's highly inefficient for already ordered sets of data (~O(n<sup>2</sup>) time complexity).
 
 ## Installation and Build ##
