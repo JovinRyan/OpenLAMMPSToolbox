@@ -5,7 +5,8 @@
 #include <iostream>
 
 #include "containers/dump_data_container.h"
+#include "utils/vector_utils.h"
 
-std::vector<int> get_displacement_vec(dump_data_container &in_dump, double disp_threshold);
+std::pair<std::vector<int>, std::vector<int>> get_displacement_vec(dump_data_container &in_dump, double disp_threshold);
 
 #endif

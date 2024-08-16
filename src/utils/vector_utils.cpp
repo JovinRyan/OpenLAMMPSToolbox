@@ -17,3 +17,9 @@ void vector_add_from_vector(std::vector<int> &vec_a, std::vector<int> &vec_b)
   std::sort(vec_a.begin(), vec_a.end());
   vec_a.erase(std::unique(vec_a.begin(), vec_a.end()), vec_a.end());
 }
+
+void vector_make_unique(std::vector<int> &in_vec)
+{
+  std::sort(in_vec.begin(), in_vec.end());
+  in_vec.erase(std::unique(in_vec.begin(), in_vec.end()), in_vec.end());
+}

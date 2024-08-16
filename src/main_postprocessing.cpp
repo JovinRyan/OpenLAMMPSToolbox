@@ -123,18 +123,42 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(custom_ddc, outfile);
   }
 
+  else if (ftype == "xyz" && analysis.first == "displacement" && write_file)
+  {
+    dump_data_container xyz_ddc = xyzToDumpData(infile);
+
+    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, disp_vec);
+
+    std::cout << "Writing \"xyz\" Type File Capability Coming Soon!\n"; // Implement xyz write file soon.
+
+    ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
+  }
+
+  else if (ftype == "custom" && analysis.first == "displacement" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, disp_vec);
+
+    ddc_to_custom_dump(subset_ddc, outfile);
+  }
+
   else if (ftype == "xyz" && analysis.first == "displacement")
   {
     dump_data_container xyz_ddc = xyzToDumpData(infile);
 
-    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second);
+    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second).second;
   }
 
   else if (ftype == "custom" && analysis.first == "displacement")
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
-    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second);
+    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second).second;
   }
 
   else if (ftype == "custom" && analysis.first == "sort_compute" && write_file)
