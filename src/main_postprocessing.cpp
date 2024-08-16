@@ -32,6 +32,8 @@ int main(int argc, char **argv)
   bool write_file = false;
   double disp_threshold = 1;
 
+  std::string displacement_flag = "first_frame";
+
   olt.add_option("--file, -f", infile, "Required LAMMPS Dump File")
       ->required()
       ->check(CLI::ExistingFile);
@@ -50,6 +52,8 @@ int main(int argc, char **argv)
       ->expected(3, 4);
 
   olt.add_option("--analysis, -a", analysis, "Analyses Such as Sorting, Finding Displaced Atoms, etc.");
+
+  olt.add_option("--displacement_flag", displacement_flag, "Reference for Calculating Atom Displacement.");
 
   olt.add_option("--macro", macro_vec, "Set of Predefined Macros");
 
