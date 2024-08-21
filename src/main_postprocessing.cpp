@@ -131,7 +131,7 @@ int main(int argc, char **argv)
   {
     dump_data_container xyz_ddc = xyzToDumpData(infile);
 
-    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second).second;
+    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second, displacement_flag).second;
 
     dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, disp_vec);
 
@@ -144,7 +144,9 @@ int main(int argc, char **argv)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
-    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second).second;
+    ddc_id_quicksort(custom_ddc);
+
+    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second, displacement_flag).second;
 
     dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, disp_vec);
 
@@ -155,14 +157,16 @@ int main(int argc, char **argv)
   {
     dump_data_container xyz_ddc = xyzToDumpData(infile);
 
-    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second).second;
+    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second, displacement_flag).second;
   }
 
   else if (ftype == "custom" && analysis.first == "displacement")
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
-    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second).second;
+    ddc_id_quicksort(custom_ddc);
+
+    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second, displacement_flag).second;
   }
 
   else if (ftype == "custom" && analysis.first == "sort_compute" && write_file)

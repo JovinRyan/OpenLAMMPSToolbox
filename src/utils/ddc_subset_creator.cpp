@@ -13,7 +13,7 @@ std::vector<std::unique_ptr<atom>> atom_subset_from_id(std::vector<std::unique_p
 
 dump_data_container id_vec_to_ddc(dump_data_container &base_ddc, std::vector<int> &id_vec)
 {
-  ddc_id_quicksort(base_ddc); // making sure base ddc is sorted by ID
+  // ddc_id_quicksort(base_ddc); // making sure base ddc is sorted by ID
 
   std::vector<double> timestep_vec_copy = base_ddc.get_timestep_vec();
 

@@ -7,4 +7,6 @@
 
 #include "containers/atom_classes.h"
 
+bool id_sort_check_no_exit(std::vector<atom> &in_atom_vec);
+
 bool id_sort_check(std::vector<atom> &in_atom_vec);
