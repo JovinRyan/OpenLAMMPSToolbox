@@ -30,7 +30,7 @@ std::vector<std::unique_ptr<atom>> sequential_atom_creator(int count)
   std::mt19937 rng(rd());                                // Random-number engine used (Mersenne-Twister in this case)
   std::uniform_real_distribution<double> und(-100, 100); // Guaranteed unbiased double
 
-  for (int i = 1; i < count; i++)
+  for (int i = 1; i <= count; i++)
   {
     sequential_atom_vec.push_back(std::make_unique<atom>(atom(i, 1, und(rng), und(rng), und(rng))));
   }
