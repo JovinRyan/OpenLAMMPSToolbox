@@ -35,6 +35,7 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/utils/ddc_reset_id.cpp
     ${SOURCE_DIR}/utils/ddc_subset_creator.cpp
     ${SOURCE_DIR}/utils/vector_utils.cpp
+    ${SOURCE_DIR}/utils/atom_creator.cpp
 )
 
 set(MAIN_SOURCE_FILE
@@ -57,5 +58,10 @@ set(MAIN_TEST_FILE
 
 add_executable(run_tests ${MAIN_TEST_FILE} ${TEST_FILES} )
 
+set(MAIN_DEV_FILE
+    ${SOURCE_DIR}/main_dev.cpp
+)
+
+add_executable(olt_dev ${MAIN_DEV_FILE} ${SOURCE_FILES})
 
 include_directories(${INCLUDE_DIR})
