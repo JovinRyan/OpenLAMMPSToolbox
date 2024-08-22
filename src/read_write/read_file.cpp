@@ -45,6 +45,10 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
                                                                stod(string_to_vec(parsedfile[j])[2]), stod(string_to_vec(parsedfile[j])[3]))));
     } /* Sloppy numbering for ID but it works */
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
+
+    frame_boxbounds_vec.push_back({std::make_pair(frame_atoms_vec[i][0]->get_coords()[0], frame_atoms_vec[i][atomscount_vec[i] - 1]->get_coords()[0]),
+                                   std::make_pair(frame_atoms_vec[i][0]->get_coords()[1], frame_atoms_vec[i][atomscount_vec[i] - 1]->get_coords()[1]),
+                                   std::make_pair(frame_atoms_vec[i][0]->get_coords()[2], frame_atoms_vec[i][atomscount_vec[i] - 1]->get_coords()[2])});
   }
 
   return dump_data_container(timesteps_vec, atomscount_vec, std::move(frame_atoms_vec), frame_boxbounds_vec);
