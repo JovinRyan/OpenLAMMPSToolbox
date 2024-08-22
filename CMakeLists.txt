@@ -50,6 +50,7 @@ set(TEST_FILES
     ${SOURCE_FILES}
     ${TEST_DIR}/atom_quicksort_test.cpp
     ${TEST_DIR}/atom_methods_test.cpp
+    ${TEST_DIR}/sort_check_test.cpp
 )
 
 set(MAIN_TEST_FILE
