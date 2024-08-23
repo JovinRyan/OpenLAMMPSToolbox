@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 
   // Defining options
   std::ifstream infile;
+  std::ifstream ref_file;
   std::string ftype = "";
   std::string atom_flag = "";
   std::string outfile;
@@ -36,6 +37,8 @@ int main(int argc, char **argv)
 
   olt.add_option("--file, -f", infile, "Required LAMMPS Dump File")
       ->required()
+      ->check(CLI::ExistingFile);
+  olt.add_option("--ref_file", ref_file, "Reference LAMMPS Dump File")
       ->check(CLI::ExistingFile);
 
   olt.add_option("--file_type, -t", ftype, "Dump File Type");
@@ -132,6 +135,21 @@ int main(int argc, char **argv)
     dump_data_container xyz_ddc = xyzToDumpData(infile);
 
     std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second, displacement_flag).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, disp_vec);
+
+    std::cout << "Writing \"xyz\" Type File Capability Coming Soon!\n"; // Implement xyz write file soon.
+
+    ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
+  }
+
+  else if (ftype == "xyz" && analysis.first == "displacement_ref" && write_file)
+  {
+    dump_data_container xyz_ddc = xyzToDumpData(infile);
+
+    dump_data_container ref_xyz_ddc = xyzToDumpData(ref_file);
+
+    std::vector<int> disp_vec = get_displacement_vec_from_ref(xyz_ddc, ref_xyz_ddc, analysis.second).second;
 
     dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, disp_vec);
 
