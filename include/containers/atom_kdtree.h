@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef ATOM_KDTREE_H
 #define ATOM_KDTREE_H
 
@@ -33,7 +31,7 @@ public:
 
   atom_kdtree(const std::vector<atom> &atom_vec);
 
-  atom find_nn(atom &target_atom) const;
+  atom get_nn(atom &target_atom) const;
 };
 
 #endif
