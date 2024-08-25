@@ -31,7 +31,6 @@ int main(int argc, char **argv)
 
   std::vector<std::string> selection_vec;
   bool write_file = false;
-  double disp_threshold = 1;
 
   std::string displacement_flag = "first_frame";
 
@@ -42,8 +41,6 @@ int main(int argc, char **argv)
       ->check(CLI::ExistingFile);
 
   olt.add_option("--file_type, -t", ftype, "Dump File Type");
-
-  olt.add_option("--disp_threshold", disp_threshold, "Minimum Distance (Dump File Units) To Count as Atom Displacement");
 
   olt.add_flag("-w, --write", write_file, "Write File Flag");
 
