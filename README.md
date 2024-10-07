@@ -51,7 +51,7 @@ That is, if the data is of the form ```ITEM: ATOMS id type x y z v_KE v_PE``` ``
 ```
   -a,--analysis [TEXT,FLOAT]  Analyses Such as Sorting, Finding Displaced Atoms, etc.
 ```
-Usage: ```-s displacement_ref 0.8``` <br>
+Usage: ```-a displacement_ref 0.8``` <br>
 Supported values: ```displacement_ref``` or ```displacement``` or ```sort_compute``` or ```sort_coordinate```. <br>
 Second value provided must be numerical. For "displacement" type calculations it is the minimum displacment threshold (positive float in input file units), and for "sorting" type calculations it is the index of coordinate or per atom computes. <br>
 Note: index for coordinates and per atom computes is 1-indexed.
