@@ -7,6 +7,7 @@
 #include "calculations/ddc_get_displacement.h"
 #include "calculations/ddc_compute_delta_selection.h"
 #include "calculations/ddc_compute_selection.h"
+#include "calculations/ddc_bulk_selection.h"
 #include "utils/ddc_sort.h"
 #include "utils/sort_checker.h"
 #include "utils/ddc_subset_creator.h"
@@ -24,6 +25,7 @@ int main(int argc, char **argv)
   std::string ftype = "";
   std::string atom_flag = "";
   std::string outfile;
+  std::vector<double> fs_threshold_vec;
 
   std::pair<std::string, double> analysis(" ", 1.0);
 
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
   olt.add_option("--atom_flag", atom_flag, "Data Stored For Each Atom"); // atom_flag = {varying, pe_ke, }
 
   olt.add_option("--selection, -s", selection_vec, "Command For All Selection/Subset Creation Processes. Selection is inclusive (>= and <=). Usage: --selection <Atom Parameter> <greater_than or less_than> <threshold>. If Atom Parameter = \"compute\" Additional <Index> Argument Required After <Atom Parameter>")
-      ->expected(3, 4);
+      ->expected(3, 8);
 
   olt.add_option("--analysis, -a", analysis, "Analyses Such as Sorting, Finding Displaced Atoms, etc.");
 
@@ -202,6 +204,8 @@ int main(int argc, char **argv)
 
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
+    ddc_id_quicksort(custom_ddc);
+
     std::vector<int> id_vec = ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index).second;
 
     dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
@@ -215,6 +219,8 @@ int main(int argc, char **argv)
     double threshold = stod(selection_vec[3]);
 
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    ddc_id_quicksort(custom_ddc);
 
     ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index);
   }
@@ -339,6 +345,40 @@ int main(int argc, char **argv)
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
 
     ddc_compute_less_than(custom_ddc, threshold, compute_index);
+  }
+
+  else if (ftype == "custom" && selection_vec[0] == "bulk_selection" && selection_vec[1] == "explicit" && write_file)
+  {
+    std::vector<double> min_max_vec;
+    for (int i = 2; i < size(selection_vec); i++)
+    {
+      min_max_vec.push_back(stod(selection_vec[i]));
+    }
+
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    std::vector<int> id_vector = ddc_bulk_selection_explicit(custom_ddc, min_max_vec).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vector);
+
+    ddc_to_custom_dump(subset_ddc, outfile);
+  }
+
+  else if (ftype == "xyz" && selection_vec[0] == "bulk_selection" && selection_vec[1] == "explicit" && write_file)
+  {
+    std::vector<double> min_max_vec;
+    for (int i = 2; i < size(selection_vec); i++)
+    {
+      min_max_vec.push_back(stod(selection_vec[i]));
+    }
+
+    dump_data_container xyz_ddc = xyzToDumpData(infile);
+
+    std::vector<int> id_vector = ddc_bulk_selection_explicit(xyz_ddc, min_max_vec).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, id_vector);
+
+    ddc_to_custom_dump(subset_ddc, outfile);
   }
 
   else

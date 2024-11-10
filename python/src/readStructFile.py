@@ -27,6 +27,6 @@ def readCustom(infile : str):
   atom_count = len(df)
   atom_types = len(np.unique(df["Type"]))
 
-  file_data_dict = {"Atom_Count" : atom_count, "Atom_Types" : atom_types, "BoxBounds" : boxbounds_vec}
+  file_data_dict = {"Atom_Count" : atom_count, "Atom_Types" : atom_types, "Box_Bounds" : boxbounds_vec}
   return df, file_data_dict
 
