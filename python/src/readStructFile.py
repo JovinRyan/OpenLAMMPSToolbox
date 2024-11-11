@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 def readCustom(infile : str):
+  print("Reading File: " + infile)
   boxbounds_vec = []
 
   with open(infile) as file:

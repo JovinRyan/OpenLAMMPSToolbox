@@ -2,7 +2,6 @@ import pandas as pd
 import random as r
 import numpy as np
 from scipy import spatial
-import readStructFile as rsf
 
 def getAvgCoord(df : pd.DataFrame, id_list : list):
   xlist = []
@@ -43,9 +42,5 @@ def createFrenkelPairs(df : pd.DataFrame, data_dict : dict, num : int, coordinat
 
 
 def createVacancy(df : pd.DataFrame, data_dict : dict, num : int):
-  print("Creatubg " + str(num) + " Vacancy Defects.")
+  print("Creating " + str(num) + " Vacancy Defects.")
 
-
-df, struct_dict = rsf.readCustom("./python/Ni_FCC_1tenth.lmp")
-
-createFrenkelPairs(df, struct_dict, 4)

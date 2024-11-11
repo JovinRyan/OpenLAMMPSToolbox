@@ -9,11 +9,11 @@ def dfdict_toStructFile(df : pd.DataFrame, data_dict : dict, filename = "OutputF
  print("Writing File: " + filename)
  with open(filename, "w") as file:
     file.write("#Structure File Created Using OpenLAMMPSToolbox, a project by Jovin Ryan. See github.com/JovinRyan/OpenLAMMPSToolbox for more info.\n")
-    file.write(str(int(data_dict["AtomCount"])) + " atoms\n")
-    file.write(str(int(data_dict["AtomTypes"])) + " atom types\n\n")
-    file.write(str(data_dict["BoxBounds"][0]) + " " + str(data_dict["BoxBounds"][1]) + " xlo xhi\n")
-    file.write(str(data_dict["BoxBounds"][2]) + " " + str(data_dict["BoxBounds"][3]) + " ylo yhi\n")
-    file.write(str(data_dict["BoxBounds"][4]) + " " + str(data_dict["BoxBounds"][5]) + " zlo zhi\n\n")
+    file.write(str(int(data_dict["Atom_Count"])) + " atoms\n")
+    file.write(str(int(data_dict["Atom_Types"])) + " atom types\n\n")
+    file.write(str(data_dict["Box_Bounds"][0]) + " " + str(data_dict["Box_Bounds"][1]) + " xlo xhi\n")
+    file.write(str(data_dict["Box_Bounds"][2]) + " " + str(data_dict["Box_Bounds"][3]) + " ylo yhi\n")
+    file.write(str(data_dict["Box_Bounds"][4]) + " " + str(data_dict["Box_Bounds"][5]) + " zlo zhi\n\n")
     file.write("Atoms\n\n")
     file.write(df.to_string(index=False, header=False))
 
