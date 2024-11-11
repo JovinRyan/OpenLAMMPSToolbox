@@ -1,7 +1,7 @@
 import argparse as ap
-from PeriodicCreate import populateLatticePoints3D
-from DFStructureFileWrite import DFStructFileWrite
-from CrystalPointsDict import getStruct_Points
+from src import PeriodicCreate as pc
+from src import writeStructFile as wsf
+from src import CrystalPointsDict as cpd
 
 
 parser = ap.ArgumentParser(description="Python scripts to create Molecular Dynamics (MD) structure files.",
@@ -23,5 +23,5 @@ LPb = args.lp[1]
 LPc = args.lp[2]
 bufx, bufy, bufz = args.buf
 
-DFStructFileWrite(populateLatticePoints3D(getStruct_Points(StructKey), DimX, DimY, DimZ, LPa, LPb, LPc), args.outf, bufx, bufy, bufz)
+wsf.df_toStructFile(pc.populateLatticePoints3D(cpd.getStructPoints(StructKey), DimX, DimY, DimZ, LPa, LPb, LPc), args.outf, bufx, bufy, bufz)
 

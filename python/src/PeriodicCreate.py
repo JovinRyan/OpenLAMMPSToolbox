@@ -1,9 +1,6 @@
 import pandas as pd
 import numpy as np
 
-from DFStructureFileWrite import DFStructFileWrite
-from CrystalPointsDict import getStruct_Points
-
 
 def getLatticePoints(Dim : float, Lattice_Param : float):
   Lattice_Points = []
