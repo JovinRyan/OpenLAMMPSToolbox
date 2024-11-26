@@ -157,6 +157,24 @@ int main(int argc, char **argv)
     ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
   }
 
+  else if (ftype == "custom" && analysis.first == "displacement_ref" && write_file)
+  {
+    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
+
+    dump_data_container ref_custom_ddc = customToDumpData(ref_file, atom_flag);
+
+    ddc_id_quicksort(custom_ddc);
+    ddc_id_quicksort(ref_custom_ddc);
+
+    std::vector<int> disp_vec = get_displacement_vec_from_ref(custom_ddc, ref_custom_ddc, analysis.second).second;
+
+    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, disp_vec);
+
+    std::cout << "Writing \"xyz\" Type File Capability Coming Soon!\n"; // Implement xyz write file soon.
+
+    ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
+  }
+
   else if (ftype == "custom" && analysis.first == "displacement" && write_file)
   {
     dump_data_container custom_ddc = customToDumpData(infile, atom_flag);

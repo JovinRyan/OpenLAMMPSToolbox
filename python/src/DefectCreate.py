@@ -43,4 +43,28 @@ def createFrenkelPairs(df : pd.DataFrame, data_dict : dict, num : int, coordinat
 
 def createVacancy(df : pd.DataFrame, data_dict : dict, num : int):
   print("Creating " + str(num) + " Vacancy Defects.")
+  df_array = df[["X", "Y", "Z"]].values
 
+  tree = spatial.KDTree(df_array)
+
+  xmin = data_dict["Box_Bounds"][0]
+  xmax = data_dict["Box_Bounds"][1]
+  ymin = data_dict["Box_Bounds"][2]
+  ymax = data_dict["Box_Bounds"][3]
+  zmin = data_dict["Box_Bounds"][4]
+  zmax = data_dict["Box_Bounds"][5]
+
+def createInterstitial(df: pd.DataFrame, data_dict : dict, num : int, interstitial_id = 1):
+  print("Creating " + str(num) + " Interstitial Defects.")
+  df_array = df[["X", "Y", "Z"]].values
+
+  tree = spatial.KDTree(df_array)
+
+  xmin = data_dict["Box_Bounds"][0]
+  xmax = data_dict["Box_Bounds"][1]
+  ymin = data_dict["Box_Bounds"][2]
+  ymax = data_dict["Box_Bounds"][3]
+  zmin = data_dict["Box_Bounds"][4]
+  zmax = data_dict["Box_Bounds"][5]
+
+  # for i in range(num):
