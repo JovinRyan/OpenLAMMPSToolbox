@@ -9,7 +9,7 @@
 *.vscode
 
 # Python files
-/python/__pycache__/
+__pycache__
 
 # Specific files made/used during development and testing
 atom_disp_test

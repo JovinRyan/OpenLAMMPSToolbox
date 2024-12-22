@@ -51,7 +51,7 @@ dump_data_container xyzToDumpData(std::ifstream &infile)
                                    std::make_pair(frame_atoms_vec[i][0]->get_coords()[2], frame_atoms_vec[i][atomscount_vec[i] - 1]->get_coords()[2])});
   }
 
-  return dump_data_container(timesteps_vec, atomscount_vec, std::move(frame_atoms_vec), frame_boxbounds_vec);
+  return dump_data_container(std::move(timesteps_vec), std::move(atomscount_vec), std::move(frame_atoms_vec), std::move(frame_boxbounds_vec));
 }
 
 dump_data_container customToDumpData(std::ifstream &infile, std::string atom_flag)
@@ -135,5 +135,5 @@ dump_data_container customToDumpData(std::ifstream &infile, std::string atom_fla
     std::cout << "Parsing Frame " << i + 1 << "/" << size(frame_atoms_vec) << " Atom Count: " << size(frame_atoms_vec[i]) << "\n";
   }
 
-  return dump_data_container(timesteps_vec, atomscount_vec, std::move(frame_atoms_vec), frame_boxbounds_vec);
+  return dump_data_container(std::move(timesteps_vec), std::move(atomscount_vec), std::move(frame_atoms_vec), std::move(frame_boxbounds_vec));
 }
