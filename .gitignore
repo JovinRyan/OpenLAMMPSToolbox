@@ -10,6 +10,7 @@
 
 # Python files
 __pycache__
+/python/mainGetItDone.py
 
 # Specific files made/used during development and testing
 atom_disp_test
