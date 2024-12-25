@@ -1,4 +1,5 @@
 import pandas as pd
+from scipy import spatial
 
 def numBulkSelection(structfile_df : pd.DataFrame, structfiledata_dict : dict, num : int, freesurface_padding = 0.05):
   x_range = structfiledata_dict["Box_Bounds"][1] - structfiledata_dict["Box_Bounds"][0]
@@ -31,3 +32,12 @@ def numBulkSelection(structfile_df : pd.DataFrame, structfiledata_dict : dict, n
 
   return selectedatomsid_vec
 
+def nnSelectionByID(structfile_df : pd.DataFrame, structfiledata_dict : dict, id : int, neighbor_num : int):
+  df_array = structfile_df[["X", "Y", "Z"]].values
+  tree = spatial.KDTree(df_array)
+
+  initial_coord = structfile_df[structfile_df["ID"] == id][["X", "Y", "Z"]].values[0]
+
+  nnindex_list = tree.query(initial_coord, neighbor_num + 1)[1]
+
+  return nnindex_list
