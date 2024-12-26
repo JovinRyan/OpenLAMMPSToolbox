@@ -40,4 +40,6 @@ def nnSelectionByID(structfile_df : pd.DataFrame, structfiledata_dict : dict, id
 
   nnindex_list = tree.query(initial_coord, neighbor_num + 1)[1]
 
-  return nnindex_list
+  nnid_list = structfile_df.iloc[nnindex_list, :]["ID"].values # Converts from index to ID for unordered datafiles.
+
+  return nnid_list
