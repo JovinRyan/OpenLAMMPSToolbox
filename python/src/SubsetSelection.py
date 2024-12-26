@@ -1,6 +1,17 @@
 import pandas as pd
 from scipy import spatial
 
+def subsetFromIDList(structfile_df : pd.DataFrame, id_list : list):
+  subset_df = structfile_df[structfile_df["ID"].isin(id_list)]
+
+  subset_boxbounds = [min(subset_df["X"]), max(subset_df["X"]), min(subset_df["Y"]), max(subset_df["Y"]), min(subset_df["Z"]), max(subset_df["Z"])]
+  subset_atomcount = len(subset_df)
+  subset_atomtypes = len(subset_df["Type"].unique())
+
+  subset_file_data_dict = {"Atom_Count" : subset_atomcount, "Atom_Types" : subset_atomtypes, "Box_Bounds" : subset_boxbounds}
+
+  return subset_df, subset_file_data_dict
+
 def numBulkSelection(structfile_df : pd.DataFrame, structfiledata_dict : dict, num : int, freesurface_padding = 0.05):
   x_range = structfiledata_dict["Box_Bounds"][1] - structfiledata_dict["Box_Bounds"][0]
   y_range = structfiledata_dict["Box_Bounds"][3] - structfiledata_dict["Box_Bounds"][2]

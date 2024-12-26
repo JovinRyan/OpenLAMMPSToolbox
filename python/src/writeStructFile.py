@@ -42,3 +42,17 @@ def df_toStructFile(df : pd.DataFrame, FileName : str, xbuf = 0, ybuf = 0, zbuf 
     file.write(str(zlo) + " " + str(zhi) + " zlo zhi\n\n")
     file.write("Atoms\n\n")
     file.write(df.to_string(index=False, header=False))
+
+def dfdict_toLAMMPSDump(df : pd.DataFrame, data_dict : dict, filename = "OutputFile.lmp"):
+  print("Writing File: " + filename)
+  with open(filename, "w") as file:
+    file.write("ITEM: TIMESTEP\n")
+    file.write("0\n")
+    file.write("ITEM: NUMBER OF ATOMS\n")
+    file.write(str(data_dict["Atom_Count"]) + "\n")
+    file.write("ITEM: BOX BOUNDS pp pp pp\n")
+    for i in range(3):
+      file.write(str(data_dict["Box_Bounds"][i*2]) + " " + str(data_dict["Box_Bounds"][i*2+1]) + "\n")
+
+    file.write("ITEM: ATOMS id type x y z v_ke v_pe\n")
+    file.write(df.to_string(index=False, header=False))
