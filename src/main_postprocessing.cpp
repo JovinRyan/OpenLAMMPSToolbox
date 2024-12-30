@@ -1,7 +1,9 @@
 #include <iostream>
+#include <thread>
+#include <string>
 #include <fstream>
-
-#include "cli/CLI11.hpp"
+#include <algorithm>
+#include <readline/readline.h>
 
 #include "containers/dump_data_container.h"
 #include "calculations/ddc_get_displacement.h"
@@ -15,393 +17,306 @@
 #include "read_write/write_file.h"
 #include "read_write/read_file.h"
 
-int main(int argc, char **argv)
+int main()
 {
-  CLI::App olt{"OpenLAMMPSToolbox App"};
-
-  // Defining options
-  std::ifstream infile;
-  std::ifstream ref_file;
-  std::string ftype = "";
+  std::string filename;
+  std::string file_type = "lammps_dump";
   std::string atom_flag = "";
-  std::string outfile;
-  std::vector<double> fs_threshold_vec;
+  bool outf_ddc_bool = false;
 
-  std::pair<std::string, double> analysis(" ", 1.0);
+  dump_data_container infile_ddc;
+  dump_data_container outfile_ddc;
+  dump_data_container reffile_ddc;
 
-  std::vector<double> macro_vec;
+  std::cout << "OpenLAMMPSToolbox\n";
+  std::cout << "A project by Jovin Ryan Joseph\n";
+  std::cout << "For more info check out https://github.com/JovinRyan/OpenLAMMPSToolbox\n\n";
+  std::cout << "Enter the file for post-processing: \n";
 
-  std::vector<std::string> selection_vec;
-  bool write_file = false;
-
-  std::string displacement_flag = "first_frame";
-
-  olt.add_option("--file, -f", infile, "Required LAMMPS Dump File")
-      ->required()
-      ->check(CLI::ExistingFile);
-  olt.add_option("--ref_file", ref_file, "Reference LAMMPS Dump File")
-      ->check(CLI::ExistingFile);
-
-  olt.add_option("--file_type, -t", ftype, "Dump File Type");
-
-  olt.add_flag("-w, --write", write_file, "Write File Flag");
-
-  olt.add_option("--outfile", outfile, "Output File Name");
-
-  olt.add_option("--atom_flag", atom_flag, "Data Stored For Each Atom"); // atom_flag = {varying, pe_ke, }
-
-  olt.add_option("--selection, -s", selection_vec, "Command For All Selection/Subset Creation Processes. Selection is inclusive (>= and <=). Usage: --selection <Atom Parameter> <greater_than or less_than> <threshold>. If Atom Parameter = \"compute\" Additional <Index> Argument Required After <Atom Parameter>")
-      ->expected(3, 8);
-
-  olt.add_option("--analysis, -a", analysis, "Analyses Such as Sorting, Finding Displaced Atoms, etc.");
-
-  olt.add_option("--displacement_flag", displacement_flag, "Reference for Calculating Atom Displacement.");
-
-  olt.add_option("--macro", macro_vec, "Set of Predefined Macros");
-
-  CLI11_PARSE(olt, argc, argv);
-
-  if (outfile == "")
+  char *input = readline(">>> ");
+  if (!input)
   {
-    outfile = string_to_vec(argv[2], ".")[0] + "_processed." + string_to_vec(argv[2], ".")[1]; // must have only one "." character
-  }
-
-  // Macro 1
-  // if (macro_vec[0] == 1 && write_file && atom_flag == "varying") // --macro 1 compute_index delta_threshold compute_threshold
-  //                                                                // Selects delta compute greater than and creates union with compute greater than
-  // {
-  //   dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-  //   int compute_index = macro_vec[1] - 1;
-
-  //   std::vector<int> id_vec_a = ddc_compute_delta_selection_mag_greater_than(custom_ddc, macro_vec[2], compute_index).second;
-
-  //   std::vector<int> id_vec_b = ddc_compute_greater_than(custom_ddc, macro_vec[3], compute_index).second;
-
-  //   vector_add_from_vector(id_vec_a, id_vec_b);
-
-  //   dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec_a);
-
-  //   ddc_to_custom_dump(subset_ddc, outfile);
-
-  //   return 0;
-  // }
-
-  if (ftype == "xyz" && analysis.first == "sort_id")
-  {
-    std::cerr << "Files of type XYZ are ID sorted by default.\n";
+    std::cerr << "Error: No input provided.\n";
     return 1;
   }
 
-  else if (ftype == "custom" && analysis.first == "sort_id" && write_file)
+  filename = input;
+  free(input);
+  filename.erase(std::remove_if(filename.begin(), filename.end(), isspace), filename.end());
+
+  std::cout << "Attempting to open file: '" << filename << "'\n";
+
+  std::ifstream infile(filename);
+  if (!infile)
   {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
+    std::cerr << "Error: Unable to open file '" << filename << "'\n";
+    return 1;
   }
 
-  else if (analysis.first == "sort_coordinate" && analysis.second == 1 && ftype == "custom" && write_file)
+  std::cout << "File '" << filename << "' opened successfully.\n";
+
+  if (string_to_vec(filename, ".")[1] == "xyz")
   {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_x_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
+    file_type = "xyz";
   }
+  std::cout << "Detected file type: " << file_type << "\n";
 
-  else if (analysis.first == "sort_coordinate" && analysis.second == 2 && ftype == "custom" && write_file)
+  if (file_type == "xyz")
   {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_y_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
+    infile_ddc = xyzToDumpData(infile);
   }
-
-  else if (analysis.first == "sort_coordinate" && analysis.second == 3 && ftype == "custom" && write_file)
+  else
   {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_z_quicksort(custom_ddc);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
-  }
-
-  else if (ftype == "xyz" && analysis.first == "displacement" && write_file)
-  {
-    dump_data_container xyz_ddc = xyzToDumpData(infile);
-
-    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second, displacement_flag).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, disp_vec);
-
-    std::cout << "Writing \"xyz\" Type File Capability Coming Soon!\n"; // Implement xyz write file soon.
-
-    ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
-  }
-
-  else if (ftype == "xyz" && analysis.first == "displacement_ref" && write_file)
-  {
-    dump_data_container xyz_ddc = xyzToDumpData(infile);
-
-    dump_data_container ref_xyz_ddc = xyzToDumpData(ref_file);
-
-    std::vector<int> disp_vec = get_displacement_vec_from_ref(xyz_ddc, ref_xyz_ddc, analysis.second).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, disp_vec);
-
-    std::cout << "Writing \"xyz\" Type File Capability Coming Soon!\n"; // Implement xyz write file soon.
-
-    ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
-  }
-
-  else if (ftype == "custom" && analysis.first == "displacement_ref" && write_file)
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    dump_data_container ref_custom_ddc = customToDumpData(ref_file, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-    ddc_id_quicksort(ref_custom_ddc);
-
-    std::vector<int> disp_vec = get_displacement_vec_from_ref(custom_ddc, ref_custom_ddc, analysis.second).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, disp_vec);
-
-    std::cout << "Writing \"xyz\" Type File Capability Coming Soon!\n"; // Implement xyz write file soon.
-
-    ddc_to_custom_dump(subset_ddc, outfile); // Doesn't work for some reason, stuck at sorting.
-  }
-
-  else if (ftype == "custom" && analysis.first == "displacement" && write_file)
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second, displacement_flag).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, disp_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "xyz" && analysis.first == "displacement")
-  {
-    dump_data_container xyz_ddc = xyzToDumpData(infile);
-
-    std::vector<int> disp_vec = get_displacement_vec(xyz_ddc, analysis.second, displacement_flag).second;
-  }
-
-  else if (ftype == "custom" && analysis.first == "displacement")
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    std::vector<int> disp_vec = get_displacement_vec(custom_ddc, analysis.second, displacement_flag).second;
-  }
-
-  else if (ftype == "custom" && analysis.first == "sort_compute" && write_file)
-  {
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_compute_quicksort(custom_ddc, analysis.second);
-
-    ddc_to_custom_dump(custom_ddc, outfile);
-  }
-
-  // Selection type operation.
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "greater_than" && write_file)
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    std::vector<int> id_vec = ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "greater_than")
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_id_quicksort(custom_ddc);
-
-    ddc_compute_delta_selection_greater_than(custom_ddc, threshold, compute_index);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "less_than" && write_file)
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    std::vector<int> id_vec = ddc_compute_delta_selection_less_than(custom_ddc, threshold, compute_index).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "less_than")
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_compute_delta_selection_less_than(custom_ddc, threshold, compute_index);
-  }
-
-  // Magnitude based selections
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "magnitude_greater_than" && write_file)
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    std::vector<int> id_vec = ddc_compute_delta_selection_mag_greater_than(custom_ddc, threshold, compute_index).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "magnitude_greater_than")
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_compute_delta_selection_mag_greater_than(custom_ddc, threshold, compute_index);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "magnitude_less_than" && write_file)
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    std::vector<int> id_vec = ddc_compute_delta_selection_mag_less_than(custom_ddc, threshold, compute_index).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute_delta" && selection_vec[2] == "magnitude_less_than")
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_compute_delta_selection_mag_less_than(custom_ddc, threshold, compute_index);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "greater_than" && write_file)
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    std::vector<int> id_vec = ddc_compute_greater_than(custom_ddc, threshold, compute_index).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "greater_than")
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_compute_greater_than(custom_ddc, threshold, compute_index);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "less_than" && write_file)
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    std::vector<int> id_vec = ddc_compute_less_than(custom_ddc, threshold, compute_index).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vec);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "compute" && selection_vec[2] == "less_than")
-  {
-    int compute_index = stoi(selection_vec[1]) - 1; // 1-indexed
-    double threshold = stod(selection_vec[3]);
-
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    ddc_compute_less_than(custom_ddc, threshold, compute_index);
-  }
-
-  else if (ftype == "custom" && selection_vec[0] == "bulk_selection" && selection_vec[1] == "explicit" && write_file)
-  {
-    std::vector<double> min_max_vec;
-    for (int i = 2; i < size(selection_vec); i++)
+    std::string atom_flag_string;
+    std::cout << "Store per atom compute data? Y/N\n";
+    std::cout << ">>> ";
+    std::cin >> atom_flag_string;
+
+    if (atom_flag_string == "Y" or "y")
     {
-      min_max_vec.push_back(stod(selection_vec[i]));
+      atom_flag = "varying";
     }
 
-    dump_data_container custom_ddc = customToDumpData(infile, atom_flag);
-
-    std::vector<int> id_vector = ddc_bulk_selection_explicit(custom_ddc, min_max_vec).second;
-
-    dump_data_container subset_ddc = id_vec_to_ddc(custom_ddc, id_vector);
-
-    ddc_to_custom_dump(subset_ddc, outfile);
+    infile_ddc = customToDumpData(infile, atom_flag);
   }
 
-  else if (ftype == "xyz" && selection_vec[0] == "bulk_selection" && selection_vec[1] == "explicit" && write_file)
+  infile.close();
+
+  std::cout << "Enter post-processing function: \n";
+  std::cout << "Implemented functions: CONVERSION, DISPLACEMENT, SORT, SUBSET\n";
+
+  input = readline(">>> ");
+  if (!input)
   {
-    std::vector<double> min_max_vec;
-    for (int i = 2; i < size(selection_vec); i++)
+    std::cerr << "Error: No input provided.\n";
+    return 1;
+  }
+
+  std::string pp_function = input;
+  free(input);
+
+  std::cout << "Post-processing function selected: " << pp_function << "\n";
+
+  if (pp_function == "CONVERSION")
+  {
+    std::cout << "Conversion to 'xyz' file type capability coming soon!" << "\n";
+
+    if (file_type == "lammps_dump")
     {
-      min_max_vec.push_back(stod(selection_vec[i]));
+      std::cerr << "Error: Conversion to 'xyz' file type not yet implemented\n";
+      return 1;
+    }
+  }
+
+  else if (pp_function == "DISPLACEMENT")
+  {
+    std::cout << "Displacement criteria: reference threshhold\n";
+    std::cout << "Note: Implemented reference methods are 'STEP', 'FIRST_FRAME', and 'EXTERNAL'\n";
+    input = readline(">>> ");
+    if (!input)
+    {
+      std::cerr << "Error: No input provided.\n";
+      return 1;
+    }
+    std::vector<std::string> input_str_vec = string_to_vec(input);
+    free(input);
+
+    double disp_threshhold = stod(input_str_vec[1]);
+
+    if (input_str_vec[0] == "EXTERNAL")
+    {
+      // Reference file hangling begins
+      std::cout << "Enter reference file: \n";
+      input = readline(">>> ");
+      if (!input)
+      {
+        std::cerr << "Error: No input provided.\n";
+        return 1;
+      }
+
+      filename = input;
+      free(input);
+      filename.erase(std::remove_if(filename.begin(), filename.end(), isspace), filename.end());
+
+      std::cout << "Attempting to open file: '" << filename << "'\n";
+
+      std::ifstream reffile(filename);
+
+      if (string_to_vec(filename, ".")[1] == "xyz")
+      {
+        file_type = "xyz";
+      }
+      std::cout << "Detected file type: " << file_type << "\n";
+
+      if (!reffile)
+      {
+        std::cerr << "Error: Unable to open file '" << filename << "'\n";
+        return 1;
+      }
+
+      std::cout << "File '" << filename << "' opened successfully.\n";
+
+      if (file_type == "xyz")
+      {
+        reffile_ddc = xyzToDumpData(reffile);
+      }
+      else
+      {
+        reffile_ddc = customToDumpData(reffile, atom_flag);
+      }
+      // Reference file handling ends
+
+      std::vector<int> disp_id_vec = get_displacement_vec_from_ref(infile_ddc, reffile_ddc, disp_threshhold).second;
+
+      outfile_ddc = id_vec_to_ddc(infile_ddc, disp_id_vec);
+    }
+    else if (input_str_vec[0] == "FIRST_FRAME")
+    {
+      std::vector<int> disp_id_vec = get_displacement_vec(infile_ddc, disp_threshhold, "first_frame").second;
+      outfile_ddc = id_vec_to_ddc(infile_ddc, disp_id_vec);
+    }
+    else if (input_str_vec[0] == "STEP")
+    {
+      std::vector<int> disp_id_vec = get_displacement_vec(infile_ddc, disp_threshhold, "step").second;
+      outfile_ddc = id_vec_to_ddc(infile_ddc, disp_id_vec);
     }
 
-    dump_data_container xyz_ddc = xyzToDumpData(infile);
+    outf_ddc_bool = true;
+  }
 
-    std::vector<int> id_vector = ddc_bulk_selection_explicit(xyz_ddc, min_max_vec).second;
+  else if (pp_function == "SORT")
+  {
+    std::string criteria;
+    int index = 0;
 
-    dump_data_container subset_ddc = id_vec_to_ddc(xyz_ddc, id_vector);
+    std::cout << "Sorting criteria: parameter index<if parameter == 'COMPUTE' or 'COORDINATE'>\n";
+    std::cout << "Note: 'index' is 1-indexed.\n";
+    input = readline(">>> ");
+    if (!input)
+    {
+      std::cerr << "Error: No input provided.\n";
+      return 1;
+    }
+    std::vector<std::string> input_str_vec = string_to_vec(input);
+    free(input);
 
-    ddc_to_custom_dump(subset_ddc, outfile);
+    criteria = input_str_vec[0];
+    if (size(input_str_vec) > 1)
+    {
+      index = stoi(input_str_vec[1]);
+    }
+
+    if ((criteria == "ID") and (file_type == "xyz"))
+    {
+      std::cout << "'xyz' type files do not contain an ID parameter for atoms.";
+
+      return 1;
+    }
+
+    else if (criteria == "ID")
+    {
+      ddc_id_quicksort(infile_ddc);
+    }
+
+    else if ((criteria == "COORDINATE") and (index == 1))
+    {
+      ddc_x_quicksort(infile_ddc);
+    }
+    else if ((criteria == "COORDINATE") and (index == 2))
+    {
+      ddc_y_quicksort(infile_ddc);
+    }
+    else if ((criteria == "COORDINATE") and (index == 3))
+    {
+      ddc_z_quicksort(infile_ddc);
+    }
+
+    else if (criteria == "COMPUTE")
+    {
+      ddc_compute_quicksort(infile_ddc, index);
+    }
+  }
+
+  else if (pp_function == "SUBSET")
+  {
+    std::cout << "Subset selection criteria: parameter index <=/>= threshhold\n";
+    std::cout << "Note: COORDINATE and COMPUTE type parameters are 1-indexed. Logic modifiers 'DELTA' or 'DELTAMAG' to be added before inequality (eg. DELTAMAG>=)\n";
+
+    input = readline(">>> ");
+    if (!input)
+    {
+      std::cerr << "Error: No input provided.\n";
+
+      return 1;
+    }
+    std::string subset_selection_string = input;
+    free(input);
+
+    std::vector<std::string> subset_selection_string_vec = string_to_vec(subset_selection_string);
+
+    int index = stoi(subset_selection_string_vec[1]) - 1; // 1-indexed
+    double threshhold = stod(subset_selection_string_vec[3]);
+
+    std::vector<int> subset_id_vec;
+
+    if (subset_selection_string_vec[0] == "COORDINATE")
+    {
+    }
+    else if (subset_selection_string_vec[0] == "COMPUTE")
+    {
+      if (subset_selection_string_vec[2] == "DELTA<=")
+      {
+        subset_id_vec = ddc_compute_delta_selection_less_than(infile_ddc, threshhold, index).second;
+      }
+      else if (subset_selection_string_vec[2] == "DELTA>=")
+      {
+        subset_id_vec = ddc_compute_delta_selection_greater_than(infile_ddc, threshhold, index).second;
+      }
+      else if (subset_selection_string_vec[2] == "DELTAMAG>=")
+      {
+        subset_id_vec = ddc_compute_delta_selection_mag_greater_than(infile_ddc, threshhold, index).second;
+      }
+      else if (subset_selection_string_vec[2] == "DELTAMAG<=")
+      {
+        subset_id_vec = ddc_compute_delta_selection_mag_less_than(infile_ddc, threshhold, index).second;
+      }
+      else
+      {
+        std::cerr << "Error: Improper input\n";
+        return 1;
+      }
+
+      outfile_ddc = id_vec_to_ddc(infile_ddc, subset_id_vec);
+      outf_ddc_bool = true;
+    }
   }
 
   else
   {
-    throw std::runtime_error("Improper Input. See User Guide at https://github.com/JovinRyan/OpenLAMMPSToolbox or Use the Help Command (--help)\n");
+    std::cerr << "Error: Improper selection \n";
+    return 1;
+  }
+
+  std::cout << "Provide name for output file: \n";
+  input = readline(">>> ");
+  if (!input)
+  {
+    std::cerr << "Error: No input provided.\n";
+    free(input);
+    input = readline(">>> ");
+  }
+  std::string outputfile_name = input;
+  free(input);
+
+  std::cout << "Attempting to write file: " << outputfile_name << "\n";
+
+  if (outf_ddc_bool) // For functions like displacement which create a new ddc
+  {
+    ddc_to_custom_dump(outfile_ddc, outputfile_name);
+  }
+  else // For functions like sort which modify the original ddc
+  {
+    ddc_to_custom_dump(infile_ddc, outputfile_name);
   }
 
   return 0;

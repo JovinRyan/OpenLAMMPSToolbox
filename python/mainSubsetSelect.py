@@ -14,6 +14,7 @@ parser.add_argument('selection_type', help = "Type of subset selection criteria"
 parser.add_argument("-id", help = "List of atom IDs for ID based subset selection", type = int, nargs='+')
 parser.add_argument("-surface_padding", help = "Fractional padding from each free surface. Default = 0.05", type = float, default = 0.05)
 parser.add_argument("-outfile_type", help = "Format for output file.", type = str, choices=["LAMMPS_Dump", "Struct"], default="LAMMPS_Dump")
+parser.add_argument("-outfile", help = "Name for output file.", type = str, default = "SubsetSelectOutput.lmp")
 
 args = parser.parse_args()
 
@@ -23,6 +24,7 @@ s_type = args.selection_type
 id_list = args.id
 padding_float = args.surface_padding
 outf_type = args.outfile_type
+outfile = args.outfile
 
 try:
   in_df, in_dict = rsf.readCustom(infile)
@@ -42,7 +44,7 @@ elif s_type == "nn":
 subset_df, subset_dict = subs.subsetFromIDList(in_df, selectedatomsid_vec)
 
 if outf_type == "LAMMPS_Dump":
-  wsf.dfdict_toLAMMPSDump(subset_df, subset_dict)
+  wsf.dfdict_toLAMMPSDump(subset_df, subset_dict, outfile)
 
 else:
-  wsf.dfdict_toStructFile(subset_df, subset_dict)
+  wsf.dfdict_toStructFile(subset_df, subset_dict, outfile)

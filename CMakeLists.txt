@@ -67,3 +67,6 @@ set(MAIN_DEV_FILE
 add_executable(olt_dev ${MAIN_DEV_FILE} ${SOURCE_FILES})
 
 include_directories(${INCLUDE_DIR})
+
+target_link_libraries(olt_dev readline)
+target_link_libraries(olt_postprocessing readline)

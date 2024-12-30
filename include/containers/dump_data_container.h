@@ -15,6 +15,7 @@ private:
 
 public:
   std::vector<std::vector<std::unique_ptr<atom>>> frame_atoms_vec;
+  dump_data_container();
   dump_data_container(std::vector<double> t_vec, std::vector<int> ac_vec,
                       std::vector<std::vector<std::unique_ptr<atom>>> fa_vec, std::vector<std::vector<std::pair<double, double>>> f_bb_vec);
 
