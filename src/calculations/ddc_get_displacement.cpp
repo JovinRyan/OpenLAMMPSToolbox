@@ -1,10 +1,17 @@
 #include "calculations/ddc_get_displacement.h"
 #include "containers/dump_data_container.h"
+#include "utils/sort_checker.h"
+#include "utils/ddc_sort.h"
 
 std::pair<std::vector<int>, std::vector<int>> get_displacement_vec(dump_data_container &in_dump, double disp_threshold, std::string displacement_flag) // count vector and id vector
 {
   std::vector<int> displacement_vec;
   std::vector<int> displacement_atom_id_vec(0);
+
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
 
   std::vector<std::vector<std::unique_ptr<atom>>> &fa_vec = in_dump.frame_atoms_vec;
 
@@ -66,6 +73,16 @@ std::pair<std::vector<int>, std::vector<int>> get_displacement_vec_from_ref(dump
 {
   std::vector<int> displacement_vec;
   std::vector<int> displacement_atom_id_vec(0);
+
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
+
+  if (!ddc_id_sort_check(ref_dump))
+  {
+    ddc_id_quicksort(ref_dump);
+  }
 
   std::vector<std::vector<std::unique_ptr<atom>>> &fa_vec = in_dump.frame_atoms_vec;
 
