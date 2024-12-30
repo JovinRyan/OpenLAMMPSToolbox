@@ -8,7 +8,7 @@ def getAvgCoord(df : pd.DataFrame, id_list : list):
   ylist = []
   zlist = []
   for id_val in id_list:
-    xlist.append(df.loc[df["ID"] == id_val, 'X'].values[0])
+    xlist.append(df.loc[df["ID"] == id_val, "X"].values[0])
     ylist.append(df.loc[df["ID"] == id_val, "Y"].values[0])
     zlist.append(df.loc[df["ID"] == id_val, "Z"].values[0])
 

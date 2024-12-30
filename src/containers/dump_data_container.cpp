@@ -1,5 +1,11 @@
 #include "containers/dump_data_container.h"
 
+// Default constructor
+dump_data_container::dump_data_container()
+    : timestep_vec{}, atomscount_vec{}, frame_atoms_vec{}, frame_box_bounds_vec{}, max_boxbounds(3)
+{
+}
+
 dump_data_container::dump_data_container(std::vector<double> t_vec, std::vector<int> ac_vec,
                                          std::vector<std::vector<std::unique_ptr<atom>>> fa_vec, std::vector<std::vector<std::pair<double, double>>> f_bb_vec)
     : timestep_vec(t_vec), atomscount_vec(ac_vec), frame_atoms_vec(std::move(fa_vec)), frame_box_bounds_vec(f_bb_vec), max_boxbounds(3)
