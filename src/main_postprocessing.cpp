@@ -10,6 +10,7 @@
 #include "calculations/ddc_compute_delta_selection.h"
 #include "calculations/ddc_compute_selection.h"
 #include "calculations/ddc_bulk_selection.h"
+#include "calculations/ddc_get_defects.h"
 #include "utils/ddc_sort.h"
 #include "utils/sort_checker.h"
 #include "utils/ddc_subset_creator.h"
@@ -83,7 +84,9 @@ int main()
   infile.close();
 
   std::cout << "Enter post-processing function: \n";
-  std::cout << "Implemented functions: CONVERSION, DISPLACEMENT, SORT, SUBSET\n";
+  std::cout << "Implemented functions: CONVERSION, DEFECT, DISPLACEMENT, SORT, SUBSET\n";
+
+  std::vector<std::vector<int>> varying_defect_atom_id_vec;
 
   input = readline(">>> ");
   if (!input)
@@ -106,6 +109,83 @@ int main()
       std::cerr << "Error: Conversion to 'xyz' file type not yet implemented\n";
       return 1;
     }
+  }
+
+  else if (pp_function == "DEFECT")
+  {
+    std::cout << "Defect selection criteria: type reference threshhold\n";
+    std::cout << "Note: implemented types are 'VOID&INTERSTITIAL'\n";
+    std::cout << "Note: implemented references are 'EXTERNAL'\n";
+
+    input = readline(">>> ");
+    if (!input)
+    {
+      std::cerr << "Error: No input provided.\n";
+      return 1;
+    }
+
+    std::vector<std::string> defect_input_str = string_to_vec(input);
+    double defect_threshold = stod(defect_input_str[2]);
+    free(input);
+
+    if (defect_input_str[1] == "EXTERNAL")
+    {
+      // Reference file hangling begins
+      std::cout << "Enter reference file: \n";
+      input = readline(">>> ");
+      if (!input)
+      {
+        std::cerr << "Error: No input provided.\n";
+        return 1;
+      }
+
+      filename = input;
+      free(input);
+      filename.erase(std::remove_if(filename.begin(), filename.end(), isspace), filename.end());
+
+      std::cout << "Attempting to open file: '" << filename << "'\n";
+
+      std::ifstream reffile(filename);
+
+      if (string_to_vec(filename, ".")[1] == "xyz")
+      {
+        file_type = "xyz";
+      }
+      std::cout << "Detected file type: " << file_type << "\n";
+
+      if (!reffile)
+      {
+        std::cerr << "Error: Unable to open file '" << filename << "'\n";
+        return 1;
+      }
+
+      std::cout << "File '" << filename << "' opened successfully.\n";
+
+      if (file_type == "xyz")
+      {
+        reffile_ddc = xyzToDumpData(reffile);
+      }
+      else
+      {
+        reffile_ddc = customToDumpData(reffile, atom_flag);
+      }
+      // Reference file handling ends
+    }
+
+    else
+    {
+    }
+
+    if (defect_input_str[0] == "VOID&INTERSTITIAL")
+    {
+      std::cout << "Selected defect type: " << defect_input_str[0] << " with threshhold: " << defect_threshold << " units\n";
+
+      varying_defect_atom_id_vec = ddc_get_void_interstitial_from_ref(infile_ddc, reffile_ddc, defect_threshold).second;
+    }
+
+    outfile_ddc = varying_id_vec_to_combine_ddc(infile_ddc, reffile_ddc, varying_defect_atom_id_vec);
+
+    outf_ddc_bool = true;
   }
 
   else if (pp_function == "DISPLACEMENT")

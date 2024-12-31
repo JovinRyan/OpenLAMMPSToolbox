@@ -24,6 +24,7 @@ set(SOURCE_FILES
     ${SOURCE_DIR}/calculations/ddc_compute_delta_selection.cpp
     ${SOURCE_DIR}/calculations/ddc_compute_selection.cpp
     ${SOURCE_DIR}/calculations/ddc_bulk_selection.cpp
+    ${SOURCE_DIR}/calculations/ddc_get_defects.cpp
     ${SOURCE_DIR}/containers/atom_classes.cpp               # Data containers
     ${SOURCE_DIR}/containers/atom_kdtree.cpp
     ${SOURCE_DIR}/containers/dump_data_container.cpp
