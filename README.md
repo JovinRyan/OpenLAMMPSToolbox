@@ -16,20 +16,30 @@ OpenLAMMPSToolbox is a collection of CLI tools used for pre- and post processing
     Selecting subset of atoms for 'group' type input file commands
   </li> 
 </ol>
-<b>Note:</b> Run the Python scripts to learn about input parameters.
+<b>Note:</b> Run the Python files with the '-h' command to learn about input parameters.
 
 ```bash
-python3 ./python/main(...).py
+python3 ./python/main(...).py -h
 ```
 ### Examples ###
 <ul>
   <li>
-    FCC Nickel structure file created using the following command:
+    Creating FCC Nickel structure:
   </li>
 
   ```bash
 ~/projects/openlammpstoolbox$ python3 ./python/mainCubicCreate.py FCC 67 67 67 3.52 3.52 3.52
   ```
+<img src="/images/FCC_Ni.png" height = 300 alt="Structure of FCC Nickel rendered using OVITO">
+
+<li>
+  Creating 15 Frenkel defect pairs in FCC Nickel:
+</li>
+
+```bash
+python3 ./python/mainDefectCreate.py NiFCC_SingleCrystal.lmp  Frenkel 15 -coord_num 12
+```
+<img src="/images/FCC_Ni_15Frenkel.png" height = 300 alt="15 Frenkel defects in FCC Nickel rendered using OVITO">
 </ul>
 
 ## Installation and Build ##
