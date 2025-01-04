@@ -4,6 +4,39 @@ OpenLAMMPSToolbox
 ## Introduction ##
 OpenLAMMPSToolbox is a collection of CLI tools used for pre- and post processing Molecular Dynamics (MD) simulations meant to be used alongside Sandia National Lab's [Large Scale Atomic/Molecular Massively Parallel Simulator](https://github.com/lammps/lammps).
 
+## Post-processing Capabilities ##
+The post-processing functions implemented follow a sequential command line interface for ease of use. Run the 'olt_postprocessing' executable and follow the subsequent prompts.
+```bash
+~/projects/openlammpstoolbox$ ./olt_postprocessing
+```
+Implemented post-processing functions include:
+<ol>
+  <li>
+    Highlighting defects (DEFECT)
+  </li>
+  <li>
+    Highligting displaced atoms (DISPLACEMENT)
+  </li>
+  <li>
+    Sorting atoms by id, coordinates, or per-atom compute data (SORT)
+  </li>
+  <li>
+    Selecting atoms by change in per-atom compute data (SUBSET)
+  </li>
+</ol>
+Additional features:
+<ul>
+  <li>
+    Automatic detection of dump file format. 'xyz' and custom LAMMPS Dump file type compatibility currently implemented
+  </li>
+  <li>
+    Writing files in custom LAMMPS dump file format
+  </li>
+  <li>
+    Compatibility to handle all stored per-atom compute data
+  </li>
+</ul>
+
 ## Python Scripts ##
 <ol>
   <li>
