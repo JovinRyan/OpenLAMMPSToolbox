@@ -5,6 +5,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_compute_greater_than(dump_data
   std::vector<int> compute_count_vec(size(in_dump.frame_atoms_vec) - 1, 0);
   std::vector<int> compute_atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
 
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
+
   std::cout << "Finding Atoms With Value of Compute Variable #" << compute_index + 1 << " >= " << threshold << "\n"; // 1-indexed to reduce complexity
 
   // ddc_compute_quicksort(in_dump, compute_index); // Probably not needed for delta type selections
@@ -42,6 +47,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_compute_less_than(dump_data_co
 {
   std::vector<int> compute_count_vec(size(in_dump.frame_atoms_vec) - 1, 0);
   std::vector<int> compute_atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
+
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
 
   std::cout << "Finding Atoms With Value of Compute Variable #" << compute_index + 1 << " <= " << threshold << "\n"; // 1-indexed to reduce complexity
 

@@ -5,6 +5,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_bulk_selection_explicit(dump_d
   std::vector<int> count_vec(size(in_dump.frame_atoms_vec), 0);
   std::vector<int> atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
 
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
+
   for (int i = 0; i < size(in_dump.frame_atoms_vec); i++)
   {
     int count = 0;

@@ -20,3 +20,18 @@ bool id_sort_check(std::vector<std::unique_ptr<atom>> &in_atom_vec)
 
   return true;
 }
+
+bool ddc_id_sort_check(dump_data_container &in_ddc)
+{
+  for (int i = 0; i < size(in_ddc.frame_atoms_vec); i++)
+  {
+    if (!id_sort_check(in_ddc.frame_atoms_vec[i]))
+    {
+      std::cout << "ID sort check: FAILED at frame #" << i + 1 << "\n";
+      return false;
+    }
+  }
+  std::cout << "ID sort check: PASSED\n";
+
+  return true;
+}

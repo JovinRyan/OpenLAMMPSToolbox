@@ -6,5 +6,6 @@
 
 #include "containers/dump_data_container.h"
 #include "utils/ddc_sort.h"
+#include "utils/sort_checker.h"
 
 std::pair<std::vector<int>, std::vector<int>> ddc_bulk_selection_explicit(dump_data_container &in_dump, std::vector<double> min_max_vec);

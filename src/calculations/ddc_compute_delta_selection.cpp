@@ -6,6 +6,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_compute_delta_selection_greate
   std::vector<int> compute_del_count_vec(size(in_dump.frame_atoms_vec) - 1, 0);
   std::vector<int> compute_del_atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
 
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
+
   std::cout << "Finding Atoms With Change in Compute Variable #" << compute_index + 1 << " >= " << threshold << "\n"; // 1-indexed to reduce complexity
 
   // ddc_compute_quicksort(in_dump, compute_index); // Probably not needed for delta type selections
@@ -46,6 +51,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_compute_delta_selection_less_t
 {
   std::vector<int> compute_del_count_vec(size(in_dump.frame_atoms_vec) - 1, 0);
   std::vector<int> compute_del_atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
+
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
 
   std::cout << "Finding Atoms With Change in Compute Variable #" << compute_index + 1 << " <= " << threshold << "\n"; // 1-indexed to reduce complexity
 
@@ -93,6 +103,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_compute_delta_selection_mag_gr
   std::vector<int> compute_del_count_vec(size(in_dump.frame_atoms_vec) - 1, 0);
   std::vector<int> compute_del_atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
 
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
+
   std::cout << "Finding Atoms With Change in Compute Variable #" << compute_index + 1 << " >= " << threshold << "\n"; // 1-indexed to reduce complexity
 
   // ddc_compute_quicksort(in_dump, compute_index); // Probably not needed for delta type selections
@@ -138,6 +153,11 @@ std::pair<std::vector<int>, std::vector<int>> ddc_compute_delta_selection_mag_le
 
   std::vector<int> compute_del_count_vec(size(in_dump.frame_atoms_vec) - 1, 0);
   std::vector<int> compute_del_atoms_id_vec{0, 0}; // Initializing ro prevent free pointer error on runtime.
+
+  if (!ddc_id_sort_check(in_dump)) // Checking and sorting
+  {
+    ddc_id_quicksort(in_dump);
+  }
 
   std::cout << "Finding Atoms With Change in Compute Variable #" << compute_index + 1 << " <= " << threshold << "\n"; // 1-indexed to reduce complexity
 
