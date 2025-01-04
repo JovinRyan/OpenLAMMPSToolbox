@@ -9,7 +9,7 @@ def readCustom(infile : str):
     inf_content = file.readlines()
 
     for line in inf_content:
-      if "Atoms " in line:
+      if "Atoms" in line:
         rows_num = inf_content.index(line) + 1
       if " xlo xhi" in line:
         line = list(filter(None, line.strip().split(" ")))
