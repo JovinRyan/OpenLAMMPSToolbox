@@ -56,3 +56,7 @@ def dfdict_toLAMMPSDump(df : pd.DataFrame, data_dict : dict, filename = "OutputF
 
     file.write("ITEM: ATOMS id type x y z v_ke v_pe\n")
     file.write(df.to_string(index=False, header=False))
+
+def df_toCSV(df : pd.DataFrame, filename = "Output.csv"):
+  print("Writing 'csv' file: " + filename)
+  df.to_csv(filename, index = False)

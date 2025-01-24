@@ -7,10 +7,12 @@
 
 # Misc.
 *.vscode
+*.csv
 
 # Python files
 __pycache__
 /python/mainGetItDone.py
+/data_analysis
 
 # Specific files made/used during development and testing
 atom_disp_test

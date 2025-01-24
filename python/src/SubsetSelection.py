@@ -1,5 +1,6 @@
 import pandas as pd
 from scipy import spatial
+import numpy as np
 
 def subsetFromIDList(structfile_df : pd.DataFrame, id_list : list):
   subset_df = structfile_df[structfile_df["ID"].isin(id_list)]
@@ -54,3 +55,32 @@ def nnSelectionByID(structfile_df : pd.DataFrame, structfiledata_dict : dict, id
   nnid_list = structfile_df.iloc[nnindex_list, :]["ID"].values # Converts from index to ID for unordered datafiles.
 
   return nnid_list
+
+
+def createCentroidsByNNandID(df: pd.DataFrame, data_dict : dict, coordnum = 2):
+  # Convert the DataFrame coordinates to a NumPy array
+    df_array = df[["X", "Y", "Z"]].values
+
+    tree = spatial.KDTree(df_array)
+
+    # Initialize lists to store results
+    centroids = []
+    all_distances = []
+
+    # Iterate through each point in the dataset
+    for point in df_array:
+        # Query the KDTree for the coordnum nearest neighbors
+        distances, indices = tree.query(point, k=coordnum)
+
+        # Extract the neighbor coordinates
+        neighbors = df_array[indices]
+
+        # Compute the centroid of the neighbors
+        centroid = np.mean(neighbors, axis=0)
+
+        # Append the centroid and distances
+        centroids.append(centroid)
+        all_distances.append(distances)
+
+    return centroids, all_distances
+
