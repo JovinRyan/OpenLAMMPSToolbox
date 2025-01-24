@@ -1,6 +1,6 @@
 #include "calculations/ddc_get_defects.h"
 
-std::pair<std::vector<int>, std::vector<std::vector<int>>> ddc_get_void_interstitial_from_ref(dump_data_container &in_dump, dump_data_container &ref_dump, double disp_threshhold)
+std::pair<std::vector<int>, std::vector<std::vector<int>>> ddc_get_vacancy_interstitial_from_ref(dump_data_container &in_dump, dump_data_container &ref_dump, double disp_threshhold)
 {
   std::vector<int> displacement_vec;
   std::vector<std::vector<int>> varying_displaced_atom_id_vec(size(in_dump.frame_box_bounds_vec));
@@ -57,4 +57,44 @@ std::pair<std::vector<int>, std::vector<std::vector<int>>> ddc_get_void_intersti
   }
 
   return std::make_pair(displacement_vec, varying_displaced_atom_id_vec);
+}
+
+std::pair<std::vector<int>, std::vector<std::vector<int>>> ddc_get_vacancy_interstitial_recombination(dump_data_container &in_dump, double disp_threshhold)
+{
+  std::vector<int> recombination_count_vec;
+  std::vector<std::vector<int>> recombined_atom_id_vec(size(in_dump.frame_box_bounds_vec));
+
+  std::vector<std::vector<std::unique_ptr<atom>>> &in_fa_vec = in_dump.frame_atoms_vec;
+
+  std::cout << "Accounding for Recombination of Vacancies & Interstitials with Threshold <= " << disp_threshhold << " Units." << "\n";
+
+  for (int i = 0; i < size(in_fa_vec); i++)
+  {
+    for (int j = 0; j < size(in_fa_vec[i]); j++)
+    {
+      for (int k = 0; k < size(in_fa_vec[i]); k++)
+      {
+        if (k != j)
+        {
+          if (in_fa_vec[i][j]->get_distance(*in_fa_vec[i][k]) <= disp_threshhold && in_fa_vec[i][j]->type != in_fa_vec[i][k]->type)
+          {
+            recombined_atom_id_vec[i].push_back(in_fa_vec[i][j]->id);
+            recombined_atom_id_vec[i].push_back(in_fa_vec[i][k]->id);
+          }
+        }
+      }
+    }
+    recombination_count_vec.push_back(size(recombined_atom_id_vec[i]) / 2);
+    std::cout << "Recombinations in Frame #" << i + 1 << " : " << recombination_count_vec[i] << "\n";
+  }
+
+  return std::make_pair(recombination_count_vec, recombined_atom_id_vec);
+}
+
+void vacancy_interstitial_vec_remove_recombinations(std::vector<std::vector<int>> &vacancy_interstitial_vec, std::vector<std::vector<int>> &recombination_vec)
+{
+  for (int i = 0; i < size(vacancy_interstitial_vec); i++)
+  {
+    vector_delete_from_vector(vacancy_interstitial_vec[i], recombination_vec[i]);
+  }
 }

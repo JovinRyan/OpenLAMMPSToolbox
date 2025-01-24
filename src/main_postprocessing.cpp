@@ -180,7 +180,24 @@ int main()
     {
       std::cout << "Selected defect type: " << defect_input_str[0] << " with threshhold: " << defect_threshold << " units\n";
 
-      varying_defect_atom_id_vec = ddc_get_void_interstitial_from_ref(infile_ddc, reffile_ddc, defect_threshold).second;
+      varying_defect_atom_id_vec = ddc_get_vacancy_interstitial_from_ref(infile_ddc, reffile_ddc, defect_threshold).second;
+    }
+
+    outfile_ddc = varying_id_vec_to_combine_ddc(infile_ddc, reffile_ddc, varying_defect_atom_id_vec);
+
+    std::cout << "Account for RECOMBINATION? y/n: \n";
+    input = readline(">>> ");
+    if (!input)
+    {
+      std::cerr << "Error: No input provided.\n";
+      return 1;
+    }
+
+    if (input == "y" or "Y")
+    {
+      std::vector<std::vector<int>> recombination_id_vec = ddc_get_vacancy_interstitial_recombination(outfile_ddc, defect_threshold).second;
+
+      vacancy_interstitial_vec_remove_recombinations(varying_defect_atom_id_vec, recombination_id_vec);
     }
 
     outfile_ddc = varying_id_vec_to_combine_ddc(infile_ddc, reffile_ddc, varying_defect_atom_id_vec);
