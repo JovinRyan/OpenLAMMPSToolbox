@@ -7,8 +7,8 @@ parser = ap.ArgumentParser(description="Python scripts to create Molecular Dynam
                            epilog=":D")
 
 parser.add_argument('infile', help="Input structure file.", type=str)
-parser.add_argument('inftype', help="Format for input file. Default = 'LAMMPS_struct'", type=str, choices=["LAMMPS_struct", 'LAMMPS_dump'], default="LAMMPS_struct")
-parser.add_argument('deftype', help="Type of defect to create. Valid args: Frenkel, Vacancy, Interstitial", type=str, choices=["Frenkel", "Vacancy", "Interstitial", "Vacancy_Sequential"])
+parser.add_argument('deftype', help="Type of defect to create. Valid args: Frenkel, Vacancy, Interstitial", type=str, choices=["Frenkel", "Vacancy", "Interstitial", "Vacancy_Sequential", "Interstitial_Sequential"])
+parser.add_argument('-inftype', help="Format for input file. Default = 'LAMMPS_struct'", type=str, choices=["LAMMPS_struct", 'LAMMPS_dump'], default="LAMMPS_struct")
 parser.add_argument('-num', help="Number of defects/defect pairs.", type=int, default=1)
 parser.add_argument('-outf', help="Name for output file.", default="DefectCreate.lmp")
 parser.add_argument('-outf_base', help="Base name for sequential defect structure file writing.", type=str, default="Sequential_Defect_")
@@ -35,7 +35,10 @@ if defect_type == "Frenkel":
   wsf.dfdict_toStructFile(df, in_dict, outfile)
 
 elif defect_type == "Vacancy_Sequential":
-  dc.createVacancies2D_Sequential(in_df, in_dict, args.xfrac, args.yfrac, args.outf_base)
+  dc.createVacanciesXY_Sequential(in_df, in_dict, args.xfrac, args.yfrac, args.outf_base)
+
+elif defect_type == "Interstitial_Sequential":
+  dc.createInterstitialsXY_Sequential(in_df, in_dict, args.xfrac, args.yfrac, args.outf_base)
 
 else:
   print("Other defect type support coming soon!\n")

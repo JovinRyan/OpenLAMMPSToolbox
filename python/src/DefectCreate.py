@@ -2,6 +2,7 @@ import pandas as pd
 import random as r
 import numpy as np
 from scipy import spatial
+from shapely import geometry
 
 from src import writeStructFile as wsf
 
@@ -15,6 +16,43 @@ def getAvgCoord(df : pd.DataFrame, id_list : list):
     zlist.append(df.loc[df["ID"] == id_val, "Z"].values[0])
 
   return np.average(xlist), np.average(ylist), np.average(zlist)
+
+def find_voids_voronoi(df_subset, threshold = 0):
+        """ Performs 2D Voronoi analysis and returns candidate interstitial sites. """
+        points = df_subset[["X", "Y"]].values
+        if len(points) < 4:
+            return []  # Not enough points for Voronoi tessellation
+
+        vor = spatial.Voronoi(points)
+        areas = {}
+
+        # Compute Voronoi cell areas
+        for idx, region_index in enumerate(vor.point_region):
+            region = vor.regions[region_index]
+            if not region or -1 in region:  # Skip infinite regions
+                continue
+            polygon = geometry.Polygon([vor.vertices[i] for i in region])
+            areas[idx] = polygon.area
+
+        # Identify large cells based on a threshold
+        median_area = np.median(list(areas.values()))
+
+        if threshold == 0:
+            threshold = 1.0 * median_area
+        candidate_indices = [idx for idx, area in areas.items() if area > threshold]
+
+        # Get centroids of these large cells as candidate interstitial sites
+        interstitial_sites = []
+        for idx in candidate_indices:
+            region_index = vor.point_region[idx]
+            region = vor.regions[region_index]
+            if not region or -1 in region:
+                continue
+            polygon = geometry.Polygon([vor.vertices[i] for i in region])
+            interstitial_sites.append(polygon.centroid.coords[0])
+
+        return interstitial_sites
+
 
 def createFrenkelPairs(df : pd.DataFrame, data_dict : dict, num : int, coordination_num = 8):
   print("Creating " + str(num) + " Frenkel Defect Pairs.")
@@ -71,7 +109,7 @@ def createVacancyByID(structfile_df : pd.DataFrame, structfiledata_dict : dict, 
 
   return structfile_df, structfiledata_dict
 
-def createIntersititalWithCoord(df: pd.DataFrame, data_dict : dict, coords, type = 1):
+def createInterstitialWithCoord(df: pd.DataFrame, data_dict : dict, coords, type = 1):
   print("Adding Interstitial at Point: " + str(coords[0]) + " " + str(coords[1]) + " " + str(coords[2]) + " ")
 
   interstitial_atom = {
@@ -115,7 +153,7 @@ def addPointsByR_2D(df : pd.DataFrame, data_dict : dict, coord_range, z = 0, r =
 
   return new_points
 
-def createVacancies2D_Sequential(df : pd.DataFrame, data_dict : dict, x_fraction, y_fraction, outf_base = "Vacancy_"):
+def createVacanciesXY_Sequential(df : pd.DataFrame, data_dict : dict, x_fraction, y_fraction, outf_base = "Vacancy_"):
   x_mean = np.mean([data_dict["Box_Bounds"][0], data_dict["Box_Bounds"][1]])
   y_mean = np.mean([data_dict["Box_Bounds"][2], data_dict["Box_Bounds"][3]])
 
@@ -149,4 +187,70 @@ def createVacancies2D_Sequential(df : pd.DataFrame, data_dict : dict, x_fraction
 
   print("Done!")
 
+def createInterstitialsXY_Sequential(df: pd.DataFrame, data_dict: dict, x_fraction, y_fraction, outf_base="Interstitial_", interstitial_type=1):
+    x_mean = np.mean([data_dict["Box_Bounds"][0], data_dict["Box_Bounds"][1]])
+    y_mean = np.mean([data_dict["Box_Bounds"][2], data_dict["Box_Bounds"][3]])
+    z_mean = np.mean([data_dict["Box_Bounds"][4], data_dict["Box_Bounds"][5]])
+
+    z_steps = df["Z"].diff()
+    z_steps = z_steps.dropna()[z_steps.dropna() > 0]
+
+    z_step = z_steps.mean()
+
+    x_bounds = [
+        x_mean - (data_dict["Box_Bounds"][1] - data_dict["Box_Bounds"][0]) * x_fraction / 2,
+        x_mean + (data_dict["Box_Bounds"][1] - data_dict["Box_Bounds"][0]) * x_fraction / 2
+    ]
+    y_bounds = [
+        y_mean - (data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]) * y_fraction / 2,
+        y_mean + (data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]) * y_fraction / 2
+    ]
+    z_bounds = [np.median(df["Z"].values) - z_step*0.55, np.median(df["Z"].values) + z_step*0.55]
+
+    print("Selected Coordinate Range: ", x_bounds, y_bounds, z_bounds)
+
+    # df_array = df[["X", "Y", "Z"]].values
+    # tree = spatial.KDTree(df_array)
+
+    index_list_lowz = df.loc[
+        (df["X"] > x_bounds[0]) & (df["X"] < x_bounds[1]) &
+        (df["Y"] > y_bounds[0]) & (df["Y"] < y_bounds[1]) &
+        (df["Z"] > z_bounds[0]) & (df["Z"] < z_mean)
+    ].index
+
+    index_list_highz = df.loc[
+        (df["X"] > x_bounds[0]) & (df["X"] < x_bounds[1]) &
+        (df["Y"] > y_bounds[0]) & (df["Y"] < y_bounds[1]) &
+        (df["Z"] > z_mean) & (df["Z"] < z_bounds[1])
+    ].index
+
+    print(str(len(index_list_highz) + len(index_list_lowz)) + " Atoms Found Within Selected Coordinate Range.")
+
+    highz_points = df.loc[index_list_highz]
+    lowz_points = df.loc[index_list_lowz]
+
+    lowz_interstitials = find_voids_voronoi(lowz_points, z_step * z_step)
+    highz_interstitials = find_voids_voronoi(highz_points, z_step * z_step)
+
+    highz_interstitials = [point + (df["Z"].loc[index_list_lowz[0]],) for point in highz_interstitials]
+    lowz_interstitials = [point + (df["Z"].loc[index_list_highz[0]],) for point in lowz_interstitials]
+
+    interstitial_list = highz_interstitials + lowz_interstitials
+
+    coordinate_df = pd.DataFrame(interstitial_list, columns=["X", "Y", "Z"])
+    coordinate_df["ID"] = range(1, len(coordinate_df) + 1)
+
+    coordinate_df = coordinate_df[["ID", "X", "Y", "Z"]]
+
+    print("Writing Coordinate Data file: " + outf_base + "Coordinate_Data.csv")
+
+    coordinate_df.to_csv(outf_base + "Coordinate_Data.csv", index = False)
+
+    for i in range(len(interstitial_list)):
+      df_copy = df.copy()
+      df_dict_copy = data_dict.copy()
+
+      new_df, new_dict = createInterstitialWithCoord(df_copy, df_dict_copy, interstitial_list[i], interstitial_type)
+
+      wsf.dfdict_toStructFile(new_df, new_dict, outf_base + str(i+1) + ".lmp")
 
