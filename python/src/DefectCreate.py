@@ -80,6 +80,17 @@ def createFrenkelPairs(df : pd.DataFrame, data_dict : dict, num : int, coordinat
   print("Done!")
   return df
 
+def createFrenkelPair_withCoordinates(df : pd.DataFrame, data_dict : dict, from_coord, to_coord):
+   df_array = df[["X", "Y", "Z"]].to_numpy()
+
+   tree = spatial.KDTree(df_array)
+
+   distance, index = tree.query(from_coord)
+
+   vacancy_id = df.loc[index, ["X", "Y", "Z"]] = to_coord
+
+   return df, data_dict
+
 
 def createVacancy(df : pd.DataFrame, data_dict : dict, num : int):
   print("Creating " + str(num) + " Vacancy Defects.")
@@ -205,7 +216,7 @@ def createInterstitialsXY_Sequential(df: pd.DataFrame, data_dict: dict, x_fracti
         y_mean - (data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]) * y_fraction / 2,
         y_mean + (data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]) * y_fraction / 2
     ]
-    z_bounds = [np.median(df["Z"].values) - z_step*0.55, np.median(df["Z"].values) + z_step*0.55]
+    z_bounds = [np.median(df["Z"].values) - z_step*0.6, np.median(df["Z"].values) + z_step*0.6]
 
     print("Selected Coordinate Range: ", x_bounds, y_bounds, z_bounds)
 
@@ -229,11 +240,14 @@ def createInterstitialsXY_Sequential(df: pd.DataFrame, data_dict: dict, x_fracti
     highz_points = df.loc[index_list_highz]
     lowz_points = df.loc[index_list_lowz]
 
+    lowz = np.mean(lowz_points["Z"])
+    highz = np.mean(highz_points["Z"])
+
     lowz_interstitials = find_voids_voronoi(lowz_points, z_step * z_step)
     highz_interstitials = find_voids_voronoi(highz_points, z_step * z_step)
 
-    highz_interstitials = [point + (df["Z"].loc[index_list_lowz[0]],) for point in highz_interstitials]
-    lowz_interstitials = [point + (df["Z"].loc[index_list_highz[0]],) for point in lowz_interstitials]
+    highz_interstitials = [point + (lowz,) for point in highz_interstitials]
+    lowz_interstitials = [point + (highz,) for point in lowz_interstitials]
 
     interstitial_list = highz_interstitials + lowz_interstitials
 
@@ -247,10 +261,88 @@ def createInterstitialsXY_Sequential(df: pd.DataFrame, data_dict: dict, x_fracti
     coordinate_df.to_csv(outf_base + "Coordinate_Data.csv", index = False)
 
     for i in range(len(interstitial_list)):
-      df_copy = df.copy()
-      df_dict_copy = data_dict.copy()
+      # df_copy = df.copy()
+      # df_dict_copy = data_dict.copy()
 
-      new_df, new_dict = createInterstitialWithCoord(df_copy, df_dict_copy, interstitial_list[i], interstitial_type)
+      df, data_dict = createInterstitialWithCoord(df, data_dict, interstitial_list[i], interstitial_type)
 
-      wsf.dfdict_toStructFile(new_df, new_dict, outf_base + str(i+1) + ".lmp")
+    wsf.dfdict_toStructFile(df, data_dict, outf_base + str(i+1) + ".lmp")
 
+    # for i in range(len(interstitial_list)):
+
+    #   new_df, new_dict = createInterstitialWithCoord(df, data_dict, interstitial_list[i], interstitial_type)
+
+def createInterstitials_XY_test(df: pd.DataFrame, data_dict: dict, x_fraction, y_fraction, outf_base="Interstitial_", interstitial_type=1, lattie_parameter = 3.52, write_flag = "sequential"):
+    x_mean = np.mean([data_dict["Box_Bounds"][0], data_dict["Box_Bounds"][1]])
+    x_range = data_dict["Box_Bounds"][1] - data_dict["Box_Bounds"][0]
+    y_mean = np.mean([data_dict["Box_Bounds"][2], data_dict["Box_Bounds"][3]])
+    y_range = data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]
+    z_mean = np.mean([data_dict["Box_Bounds"][4], data_dict["Box_Bounds"][5]])
+    z_range = data_dict["Box_Bounds"][5] - data_dict["Box_Bounds"][4]
+
+    a = x_range/(len(df["X"]))
+    b = y_range/(len(df["Y"]))
+    c = z_range/(len(df["Z"]))
+
+    z_steps = df["Z"].diff()
+    z_steps = z_steps.dropna()[z_steps.dropna() > 0]
+
+    z_step = z_steps.mean()
+
+    x_bounds = [
+        x_mean - (data_dict["Box_Bounds"][1] - data_dict["Box_Bounds"][0]) * x_fraction / 2,
+        x_mean + (data_dict["Box_Bounds"][1] - data_dict["Box_Bounds"][0]) * x_fraction / 2
+    ]
+    y_bounds = [
+        y_mean - (data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]) * y_fraction / 2,
+        y_mean + (data_dict["Box_Bounds"][3] - data_dict["Box_Bounds"][2]) * y_fraction / 2
+    ]
+    z_bounds = [np.median(df["Z"].values) - z_step*0.6, np.median(df["Z"].values) + z_step*0.6]
+
+    print("Selected Coordinate Range: ", x_bounds, y_bounds, z_bounds)
+
+    atom_coordinates = df[["X", "Y", "Z"]].to_numpy()
+
+    tree = spatial.KDTree(atom_coordinates)
+
+    x_gridpoints = np.arange(x_bounds[0], x_bounds[1], lattie_parameter/2)
+    y_gridpoints = np.arange(y_bounds[0], y_bounds[1], lattie_parameter/4)
+    z_gridpoints = np.arange(z_bounds[0], z_bounds[1], lattie_parameter/2)
+
+    interstitial_sites = []
+
+    search_radius = (lattie_parameter / np.sqrt(2)) * 0.5
+    print(f"Search radius: {search_radius}")
+
+    # Iterate efficiently over grid points
+    for x in x_gridpoints:
+        for y in y_gridpoints:
+            for z in z_gridpoints:
+                center = np.array([x, y, z])
+                if len(tree.query_ball_point(center, search_radius)) == 0:
+                    interstitial_sites.append(center)
+
+    print(f"Found {len(interstitial_sites)} interstitial sites.")
+
+    coordinate_df = pd.DataFrame(interstitial_sites, columns=["X", "Y", "Z"])
+    coordinate_df["ID"] = range(1, len(coordinate_df) + 1)
+
+    coordinate_df = coordinate_df[["ID", "X", "Y", "Z"]]
+
+    print("Writing Coordinate Data file: " + outf_base + "Coordinate_Data.csv")
+
+    coordinate_df.to_csv(outf_base + "Coordinate_Data.csv", index = False)
+
+    if write_flag == "all":
+        for i in range(len(interstitial_sites)):
+            df, data_dict = createInterstitialWithCoord(df, data_dict, interstitial_sites[i], interstitial_type)
+
+        wsf.dfdict_toStructFile(df, data_dict, outf_base + ".lmp")
+
+    elif write_flag == "sequential":
+        for i in range(len(interstitial_sites)):
+            df_copy = df.copy()
+            data_dict_copy = data_dict.copy()
+            new_df, new_data_dict = createInterstitialWithCoord(df_copy, data_dict_copy, interstitial_sites[i], interstitial_type)
+
+            wsf.dfdict_toStructFile(new_df, new_data_dict, outf_base + str(i+1) + ".lmp")

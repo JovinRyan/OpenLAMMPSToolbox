@@ -7,7 +7,8 @@ parser = ap.ArgumentParser(description="Python scripts to create Molecular Dynam
                            epilog=":D")
 
 parser.add_argument('infile', help="Input structure file.", type=str)
-parser.add_argument('deftype', help="Type of defect to create. Valid args: Frenkel, Vacancy, Interstitial", type=str, choices=["Frenkel", "Vacancy", "Interstitial", "Vacancy_Sequential", "Interstitial_Sequential"])
+parser.add_argument('deftype', help="Type of defect to create. Valid args: Frenkel, Vacancy, Interstitial", type=str, choices=["Frenkel", "Frenkel_withCoords", "Vacancy", "Interstitial", "Vacancy_Sequential", "Interstitial_Sequential",
+                                                                                                                               "Interstitial_Test"])
 parser.add_argument('-inftype', help="Format for input file. Default = 'LAMMPS_struct'", type=str, choices=["LAMMPS_struct", 'LAMMPS_dump'], default="LAMMPS_struct")
 parser.add_argument('-num', help="Number of defects/defect pairs.", type=int, default=1)
 parser.add_argument('-outf', help="Name for output file.", default="DefectCreate.lmp")
@@ -15,6 +16,8 @@ parser.add_argument('-outf_base', help="Base name for sequential defect structur
 parser.add_argument('-coord_num', help="Coordination number for atoms in given crystal structure. Default = 8", default=8, type=int)
 parser.add_argument('-xfrac', help="Fraction of X axis range to select for sequential generation of defects. Default = 0.33", default=0.33, type=float)
 parser.add_argument('-yfrac', help="Fraction of Y axis range to select for sequential generation of defects. Default = 0.33", default=0.33, type=float)
+parser.add_argument('-from_c', nargs=3, type=float, metavar=('x', 'y', 'z'), default=[0, 0, 0], help="Coordinate to create vacancy in 'Frenkel_withCoord' type defect creation.")
+parser.add_argument('-to_c', nargs=3, type=float, metavar=('x', 'y', 'z'), default=[0, 0, 0], help="Coordinate to create interstitial in 'Frenkel_withCoord' type defect creation.")
 
 args = parser.parse_args()
 
@@ -34,11 +37,19 @@ if defect_type == "Frenkel":
 
   wsf.dfdict_toStructFile(df, in_dict, outfile)
 
+elif defect_type == "Frenkel_withCoords":
+  new_df, new_data_dict = dc.createFrenkelPair_withCoordinates(in_df, in_dict, args.from_c, args.to_c)
+
+  wsf.dfdict_toStructFile(new_df, new_data_dict, outfile)
+
 elif defect_type == "Vacancy_Sequential":
   dc.createVacanciesXY_Sequential(in_df, in_dict, args.xfrac, args.yfrac, args.outf_base)
 
 elif defect_type == "Interstitial_Sequential":
   dc.createInterstitialsXY_Sequential(in_df, in_dict, args.xfrac, args.yfrac, args.outf_base)
+
+elif defect_type == "Interstitial_Test":
+  dc.createInterstitials_XY_test(in_df, in_dict, args.xfrac, args.yfrac, args.outf_base)
 
 else:
   print("Other defect type support coming soon!\n")
